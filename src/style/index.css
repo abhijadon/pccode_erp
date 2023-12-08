@@ -12,8 +12,11 @@ button,
   background-color: #1677ffa3;
   color: #ffffff !important;
 }
-button, [type='button'], [type='reset'], [type='submit']{
-      background-color: #1677ff;
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  background-color: #1677ff;
   color: #ffffff;
 }
 
@@ -25,5 +28,3 @@ button, [type='button'], [type='reset'], [type='submit']{
   align-items: center;
   justify-content: center;
 }
-
-

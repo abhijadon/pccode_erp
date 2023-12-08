@@ -1,13 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button } from 'antd';
+import { Dropdown, Table, Button, Input, } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
-
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
 import { selectListItems } from '@/redux/crud/selectors';
 import useLanguage from '@/locale/useLanguage';
-
 import { generate as uniqueId } from 'shortid';
 import useResponsiveTable from '@/hooks/useResponsiveTable';
 import { useCrudContext } from '@/context/crud';
@@ -29,6 +27,7 @@ function AddNewItem({ config }) {
   );
 }
 export default function DataTable({ config, extra = [] }) {
+  const [searchValue, setSearchValue] = useState('');
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -153,34 +152,59 @@ export default function DataTable({ config, extra = [] }) {
     dataTableColumns,
     items
   );
+  // Function to handle search value changes
+  const handleSearch = (e) => {
+    const { value } = e.target;
+    setSearchValue(value);
+  };
 
+  const filteredData = dataSource.filter((item) => {
+    const searchFields = ['email', 'phone', 'full_name', 'lead_id'];
+    const lowerCaseSearchValue = searchValue.toLowerCase();
+
+    return searchFields.some((field) => {
+      if (item[field]) {
+        const fieldValue = String(item[field]).toLowerCase();
+        return fieldValue.includes(lowerCaseSearchValue);
+      }
+      return false;
+    });
+  });
   return (
     <>
-      <div ref={tableHeader}>
-        <PageHeader
-          onBack={() => window.history.back()}
-          title={DATATABLE_TITLE}
-          ghost={false}
-          extra={[
-            <Button onClick={handelDataTableLoad} key={`${uniqueId()}`}>
-              {translate('Refresh')}
-            </Button>,
-            <AddNewItem key={`${uniqueId()}`} config={config} />,
-          ]}
-          style={{
-            padding: '20px 0px',
-          }}
-        ></PageHeader>
-      </div>
-      <Table
-        columns={tableColumns}
-        rowKey={(item) => item._id}
-        dataSource={dataSource}
-        pagination={pagination}
-        loading={listIsLoading}
-        onChange={handelDataTableLoad}
+      <div>
+        <div className='mb-14 w-1/5'>
+          <Input.Search
+            placeholder="Search"
+            onChange={handleSearch}
+          />
+        </div>
+        <div ref={tableHeader}>
+          <PageHeader
+            onBack={() => window.history.back()}
+            title={DATATABLE_TITLE}
+            ghost={false}
+            extra={[
+              <Button onClick={handelDataTableLoad} key={`${uniqueId()}`}>
+                {translate('Refresh')}
+              </Button>,
+              <AddNewItem key={`${uniqueId()}`} config={config} />,
+            ]}
+            style={{
+              padding: '20px 0px',
+            }}
+          ></PageHeader>
+        </div>
+        <Table
+          columns={tableColumns}
+          rowKey={(item) => item._id}
+          dataSource={filteredData}
+          pagination={pagination}
+          loading={listIsLoading}
+          onChange={handelDataTableLoad}
 
-      />
+        />
+      </div>
     </>
   );
 }

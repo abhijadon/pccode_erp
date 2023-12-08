@@ -56,7 +56,7 @@ export default function SidePanel({ config, topContent, bottomContent, fixHeader
 
   return (
     <Drawer
-      title={config.PANEL_TITLE}
+      title="Ahishek"
       placement="right"
       onClose={collapsePanel}
       open={!isPanelClose}

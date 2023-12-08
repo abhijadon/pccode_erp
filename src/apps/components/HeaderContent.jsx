@@ -20,7 +20,7 @@ import SelectLanguage from '@/components/SelectLanguage';
 
 export default function HeaderContent() {
   const currentAdmin = useSelector(selectCurrentAdmin);
-  const { Header, Footer, Content } = Layout;
+  const { Header } = Layout;
 
   const translate = useLanguage();
 
@@ -99,42 +99,41 @@ export default function HeaderContent() {
     },
   ];
   return (
-    <>
-      <Header
-        style={{
-          padding: '10px',
-          background: '#f9fafc',
-          display: ' flex',
-          flexDirection: ' row-reverse',
-          justifyContent: ' flex-start',
-          gap: ' 15px',
+    <Header
+      style={{
+        padding: '20px',
+        background: '#f9fafc',
+        display: ' flex',
+        flexDirection: ' row-reverse',
+        justifyContent: ' flex-start',
+        gap: ' 15px',
+      }}
+    >
+      <Dropdown
+        menu={{
+          items,
         }}
+        trigger={['click']}
+        placement="bottomRight"
+        stye={{ width: '280px', float: 'right' }}
       >
-        <Dropdown
-          menu={{
-            items,
+        {/* <Badge dot> */}
+        <Avatar
+          className="last"
+          src={srcImgProfile}
+          style={{
+            color: '#f56a00',
+            backgroundColor: !hasPhotoprofile ? '#fde3cf' : '#f9fafc',
+            float: 'right',
           }}
-          trigger={['click']}
-          placement="bottomRight"
-          stye={{ width: '280px', float: 'right' }}
+          size="large"
         >
-          {/* <Badge dot> */}
-          <Avatar
-            className="last"
-            src={srcImgProfile}
-            style={{
-              color: '#f56a00',
-              backgroundColor: !hasPhotoprofile ? '#fde3cf' : '#f9fafc',
-              float: 'right',
-            }}
-            size="large"
-          >
-            {currentAdmin?.name.charAt(0).toUpperCase()}
-          </Avatar>
-          {/* </Badge> */}
-        </Dropdown>
+          {currentAdmin?.name.charAt(0).toUpperCase()}
+        </Avatar>
+        {/* </Badge> */}
+      </Dropdown>
 
-        {/* <Avatar
+      {/* <Avatar
         icon={<AppstoreOutlined />}
         onClick={() => {
         
@@ -143,12 +142,7 @@ export default function HeaderContent() {
         size="large"
       /> */}
 
-        <SelectLanguage />
-      </Header>
-
-      <Footer className='bg-[#efefef] mt-4 drop-shadow-lg'>
-        <Content></Content>
-      </Footer>
-    </>
+      <SelectLanguage />
+    </Header>
   );
 }

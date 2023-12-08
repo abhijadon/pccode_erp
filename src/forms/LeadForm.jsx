@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Form, Select, Input, Checkbox, Radio, DatePicker, Upload, message } from 'antd';
 import formData from './formData';
-
 const { Option } = Select;
 // Inside the component
 
