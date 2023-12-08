@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button, Select } from 'antd';
+import { Dropdown, Table, Button } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,7 +11,7 @@ import useLanguage from '@/locale/useLanguage';
 import { generate as uniqueId } from 'shortid';
 import useResponsiveTable from '@/hooks/useResponsiveTable';
 import { useCrudContext } from '@/context/crud';
-const { Option } = Select;
+
 function AddNewItem({ config }) {
   const { crudContextAction } = useCrudContext();
   const { collapsedBox, panel } = crudContextAction;
@@ -29,11 +29,6 @@ function AddNewItem({ config }) {
   );
 }
 export default function DataTable({ config, extra = [] }) {
-  const [paginationConfig, setPaginationConfig] = useState({
-    current: 1,
-    pageSize: 5, // Initial number of rows per page
-    showSizeChanger: true,
-  });
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -133,12 +128,12 @@ export default function DataTable({ config, extra = [] }) {
 
   const { result: listResult, isLoading: listIsLoading } = useSelector(selectListItems);
 
-  const { items: dataSource } = listResult;
+  const { pagination, items: dataSource } = listResult;
 
   const dispatch = useDispatch();
 
   const handelDataTableLoad = useCallback((pagination) => {
-    const options = { page: pagination.current || 1, items: pagination.pageSize || 100 };
+    const options = { page: pagination.current || 1, items: pagination.pageSize || 10 };
     dispatch(crud.list({ entity, options }));
   }, []);
 
@@ -158,19 +153,7 @@ export default function DataTable({ config, extra = [] }) {
     dataTableColumns,
     items
   );
-  const handleTableChange = (pagination) => {
-    setPaginationConfig((prev) => ({
-      ...prev,
-      ...pagination,
-    }));
-  };
-  const handleRowsPerPageChange = (value) => {
-    setPaginationConfig((prev) => ({
-      ...prev,
-      current: 1,
-      pageSize: parseInt(value, 10),
-    }));
-  };
+
   return (
     <>
       <div ref={tableHeader}>
@@ -179,16 +162,6 @@ export default function DataTable({ config, extra = [] }) {
           title={DATATABLE_TITLE}
           ghost={false}
           extra={[
-            <Select
-              key="selectRowsPerPage"
-              defaultValue="5"
-              onChange={handleRowsPerPageChange}
-              style={{ width: 70 }}
-            >
-              <Option value="5">5</Option>
-              <Option value="10">10</Option>
-              <Option value="20">20</Option>
-            </Select>,
             <Button onClick={handelDataTableLoad} key={`${uniqueId()}`}>
               {translate('Refresh')}
             </Button>,
@@ -203,9 +176,10 @@ export default function DataTable({ config, extra = [] }) {
         columns={tableColumns}
         rowKey={(item) => item._id}
         dataSource={dataSource}
-        pagination={paginationConfig}
+        pagination={pagination}
         loading={listIsLoading}
-        onChange={handleTableChange}
+        onChange={handelDataTableLoad}
+
       />
     </>
   );

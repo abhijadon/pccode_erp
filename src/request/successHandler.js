@@ -11,6 +11,7 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
     if (options.notifyOnSuccess) {
       notification.config({
         duration: 5,
+        placement: 'topLeft',
       });
       notification.success({
         message: `Request success`,
@@ -24,6 +25,7 @@ const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFa
     if (options.notifyOnFailed) {
       notification.config({
         duration: 5,
+        placement: 'topLeft',
       });
       notification.error({
         message: `Request error ${status}`,
