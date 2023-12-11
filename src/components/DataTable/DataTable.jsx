@@ -27,6 +27,7 @@ function AddNewItem({ config }) {
   );
 }
 export default function DataTable({ config, extra = [] }) {
+  // State variables for filtering
   const [searchValue, setSearchValue] = useState('');
   const [selectedInstitute, setSelectedInstitute] = useState('');
   const [selectedUniversity, setSelectedUniversity] = useState('');
@@ -154,18 +155,18 @@ export default function DataTable({ config, extra = [] }) {
     dataTableColumns,
     items
   );
+
+  const universityOptions = [
+    { label: 'SPU', value: 'SPU' },
+    { label: 'CU', value: 'CU' },
+    { label: 'SGVU', value: 'SGVU' },
+    // Add more university options as needed
+  ];
   const instituteOptions = [
     { label: 'HES', value: 'HES' },
     { label: 'DES', value: 'DES' },
     // Add more institute options as needed
   ];
-
-  const universityOptions = [
-    { label: 'SPU', value: 'SPU' },
-    { label: 'DU', value: 'DU' },
-    // Add more university options as needed
-  ];
-
   // Reset filters function
   const handleResetFilters = () => {
     setSelectedInstitute('');
@@ -190,37 +191,50 @@ export default function DataTable({ config, extra = [] }) {
     setSelectedUniversity(value);
   };
 
-  // Function to filter the dataSource based on selected institute and university
   const applyFilters = (data) => {
     let filteredData = [...data];
 
     if (selectedInstitute !== '') {
       filteredData = filteredData.filter(
-        (item) => item.institute === selectedInstitute
+        (item) =>
+          item.customfields &&
+          item.customfields.institue && // Correct the key to 'institue' instead of 'institute'
+          item.customfields.institue.toLowerCase() === selectedInstitute.toLowerCase()
       );
     }
 
     if (selectedUniversity !== '') {
       filteredData = filteredData.filter(
-        (item) => item.university === selectedUniversity
+        (item) =>
+          item.customfields &&
+          item.customfields.university_name &&
+          item.customfields.university_name.toLowerCase() === selectedUniversity.toLowerCase()
       );
     }
 
     return filteredData;
   };
-
+  // Rest of your code...
 
   // Function to handle search value changes
   const handleSearch = (e) => {
     const { value } = e.target;
     setSearchValue(value);
   };
+
+  // Filtering data based on search value
   const filteredBySearch = dataSource.filter((item) => {
-    const searchFields = ['full_name', 'lead_id', 'email'];
+    // Modify searchFields as per your actual data structure
+    const searchFields = ['full_name', 'lead_id', ['contact', 'email'], ['contact', 'phone']];
+
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
     return searchFields.some((field) => {
-      if (item[field]) {
+      if (Array.isArray(field)) {
+        // Access nested fields in the data structure
+        const fieldValue = String(item[field[0]][field[1]]).toLowerCase();
+        return fieldValue.includes(lowerCaseSearchValue);
+      } else if (item[field]) {
         const fieldValue = String(item[field]).toLowerCase();
         return fieldValue.includes(lowerCaseSearchValue);
       }
@@ -228,7 +242,6 @@ export default function DataTable({ config, extra = [] }) {
     });
   });
 
-  const filteredByFilters = applyFilters(filteredBySearch);
   return (
     <>
       <div className='-mt-6'>
@@ -303,7 +316,7 @@ export default function DataTable({ config, extra = [] }) {
         <Table
           columns={tableColumns}
           rowKey={(item) => item._id}
-          dataSource={filteredByFilters}
+          dataSource={applyFilters(filteredBySearch)}
           pagination={pagination}
           loading={listIsLoading}
           onChange={handelDataTableLoad}

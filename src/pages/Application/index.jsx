@@ -8,8 +8,8 @@ export default function Lead() {
   const translate = useLanguage();
   const entity = 'lead';
   const searchConfig = {
-    displayLabels: ['full_name', 'company'],
-    searchFields: 'full_name,company',
+    displayLabels: ['full_name', 'company', 'contact.email'],
+    searchFields: ['full_name', 'company', 'contact.email'],
     outputValue: '_id',
   };
   const entityDisplayLabels = ['number', 'company'];
@@ -21,7 +21,7 @@ export default function Lead() {
     },
     {
       title: translate('University Name'),
-      dataIndex: 'university',
+      dataIndex: 'university_name',
     },
 
     {
@@ -151,9 +151,10 @@ export default function Lead() {
     },
     {
       title: translate('Institute Name'),
-      dataIndex: ['customfields', 'institue'],
-      key: 'institue'
+      dataIndex: ['customfields', 'institute'],
+      key: 'institute'
     },
+
     {
       title: 'University Name', // Assuming 'university_name' is within customfields
       dataIndex: ['customfields', 'university_name'],
