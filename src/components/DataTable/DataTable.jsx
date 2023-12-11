@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button, Input, } from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined, RedoOutlined } from '@ant-design/icons';
+import { Dropdown, Table, Button, Input, Select } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -28,6 +28,8 @@ function AddNewItem({ config }) {
 }
 export default function DataTable({ config, extra = [] }) {
   const [searchValue, setSearchValue] = useState('');
+  const [selectedInstitute, setSelectedInstitute] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState('');
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -152,14 +154,69 @@ export default function DataTable({ config, extra = [] }) {
     dataTableColumns,
     items
   );
+  const instituteOptions = [
+    { label: 'HES', value: 'HES' },
+    { label: 'DES', value: 'DES' },
+    // Add more institute options as needed
+  ];
+
+  const universityOptions = [
+    { label: 'SPU', value: 'SPU' },
+    { label: 'DU', value: 'DU' },
+    // Add more university options as needed
+  ];
+
+  // Reset filters function
+  const handleResetFilters = () => {
+    setSelectedInstitute('');
+    setSelectedUniversity('');
+    setSearchValue('');
+  };
+  // Reset filters function
+  const handleReset1 = () => {
+    setSelectedInstitute('');
+  };
+  // Reset filters function
+  const handleReset2 = () => {
+    setSelectedUniversity('');
+  };
+  // Function to handle institute filter selection
+  const handleInstituteChange = (value) => {
+    setSelectedInstitute(value);
+  };
+
+  // Function to handle university filter selection
+  const handleUniversityChange = (value) => {
+    setSelectedUniversity(value);
+  };
+
+  // Function to filter the dataSource based on selected institute and university
+  const applyFilters = (data) => {
+    let filteredData = [...data];
+
+    if (selectedInstitute !== '') {
+      filteredData = filteredData.filter(
+        (item) => item.institute === selectedInstitute
+      );
+    }
+
+    if (selectedUniversity !== '') {
+      filteredData = filteredData.filter(
+        (item) => item.university === selectedUniversity
+      );
+    }
+
+    return filteredData;
+  };
+
+
   // Function to handle search value changes
   const handleSearch = (e) => {
     const { value } = e.target;
     setSearchValue(value);
   };
-
-  const filteredData = dataSource.filter((item) => {
-    const searchFields = ['email', 'phone', 'full_name', 'lead_id'];
+  const filteredBySearch = dataSource.filter((item) => {
+    const searchFields = ['full_name', 'lead_id', 'email'];
     const lowerCaseSearchValue = searchValue.toLowerCase();
 
     return searchFields.some((field) => {
@@ -170,15 +227,63 @@ export default function DataTable({ config, extra = [] }) {
       return false;
     });
   });
+
+  const filteredByFilters = applyFilters(filteredBySearch);
   return (
     <>
-      <div>
-        <div className='mb-14 w-1/5'>
-          <Input.Search
-            placeholder="Search"
-            onChange={handleSearch}
-          />
+      <div className='-mt-6'>
+        {/* Filter condition using select for Institute */}
+        <div className='flex justify-between mb-24 items-center'>
+          <div className='flex gap-5'>
+            <div>
+              <h3>Filter by Institute</h3>
+              <Select
+                style={{ width: 200 }}
+                placeholder="Select Institute"
+                onChange={handleInstituteChange}
+                value={selectedInstitute}
+              >
+                {instituteOptions.map((option) => (
+                  <Select.Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              <p onClick={handleReset1} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
+            </div>
+            <div>
+              <h3>Filter by University</h3>
+              <Select
+                style={{ width: 200 }}
+                placeholder="Select University"
+                onChange={handleUniversityChange}
+                value={selectedUniversity}
+              >
+                {universityOptions.map((option) => (
+                  <Select.Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              <p onClick={handleReset2} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
+            </div>
+          </div>
+
+          <div className='w-1/4 flex gap-3 '>
+            <label htmlFor="Search">Search
+              <Input.Search
+                placeholder="Search"
+                onChange={handleSearch}
+              />
+            </label>
+            <div>
+              {/* Reset button */}
+              <h3>Reset</h3>
+              <Button title='Reset All Filter' onClick={handleResetFilters}><RedoOutlined /></Button>
+            </div>
+          </div>
         </div>
+        {/* Rest of the code... */}
         <div ref={tableHeader}>
           <PageHeader
             onBack={() => window.history.back()}
@@ -198,12 +303,12 @@ export default function DataTable({ config, extra = [] }) {
         <Table
           columns={tableColumns}
           rowKey={(item) => item._id}
-          dataSource={filteredData}
+          dataSource={filteredByFilters}
           pagination={pagination}
           loading={listIsLoading}
           onChange={handelDataTableLoad}
-
         />
+
       </div>
     </>
   );
