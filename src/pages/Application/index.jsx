@@ -194,6 +194,7 @@ export default function Lead() {
       title: translate('Date of birth'),
       dataIndex: ['customfields', 'dob'],
       key: 'dob',
+      render: (dob) => (dob ? new Date(dob).toLocaleDateString() : 'N/A'), // Modify the render based on how dob is stored
     },
     {
       title: translate('gender'),
@@ -254,11 +255,11 @@ export default function Lead() {
         let color =
           status === 'new'
             ? 'cyan'
-            : status === 'reached'
+            : status === 'Enrolled'
               ? 'blue'
-              : status === 'interested'
+              : status === 'Alumini'
                 ? 'green'
-                : status === 'not interested'
+                : status === 'Cancel'
                   ? 'orange'
                   : 'red';
         return <Tag color={color}>{status && translate(status)}</Tag>;

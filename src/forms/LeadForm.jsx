@@ -88,7 +88,7 @@ export default function LeadForm() {
             <Form.Item
               key={field.id}
               label={field.label}
-              name={field.name}
+              name={field.name} // This should be 'customfields.sendfeereceipt'
             >
               <Radio.Group>
                 {field.options.map((option) => (
@@ -192,7 +192,7 @@ export default function LeadForm() {
   return (
     <div>
       <form>
-        <Form.Item label="Select Institute" name="institute">
+        <Form.Item label="Select Institute" name="customfields.institute">
           <Select onChange={handleInstituteChange} placeholder="--Select Institute--">
             {formData.map((item) => (
               <Option key={item.value} value={item.value}>
@@ -203,7 +203,7 @@ export default function LeadForm() {
         </Form.Item>
 
         {selectedInstitute && (
-          <Form.Item label="Select University" name="university">
+          <Form.Item label="Select University" name="customfields.university_name">
             <Select onChange={handleUniversityChange} placeholder="--Select University--">
               {formData
                 .find((item) => item.value === selectedInstitute)

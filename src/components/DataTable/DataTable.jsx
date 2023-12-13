@@ -198,8 +198,8 @@ export default function DataTable({ config, extra = [] }) {
       filteredData = filteredData.filter(
         (item) =>
           item.customfields &&
-          item.customfields.institue && // Correct the key to 'institue' instead of 'institute'
-          item.customfields.institue.toLowerCase() === selectedInstitute.toLowerCase()
+          item.customfields.institute && // Correct the key to 'institue' instead of 'institute'
+          item.customfields.institute.toLowerCase() === selectedInstitute.toLowerCase()
       );
     }
 
@@ -211,7 +211,6 @@ export default function DataTable({ config, extra = [] }) {
           item.customfields.university_name.toLowerCase() === selectedUniversity.toLowerCase()
       );
     }
-
     return filteredData;
   };
   // Rest of your code...
@@ -225,7 +224,7 @@ export default function DataTable({ config, extra = [] }) {
   // Filtering data based on search value
   const filteredBySearch = dataSource.filter((item) => {
     // Modify searchFields as per your actual data structure
-    const searchFields = ['full_name', 'lead_id', ['contact', 'email'], ['contact', 'phone']];
+    const searchFields = ['full_name', 'lead_id'];
 
     const lowerCaseSearchValue = searchValue.toLowerCase();
 

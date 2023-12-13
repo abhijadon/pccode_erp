@@ -14,7 +14,6 @@ export default function Payment() {
   const dataTableColumns = [
     {
       title: translate('Number'),
-
       dataIndex: 'number',
     },
     {
