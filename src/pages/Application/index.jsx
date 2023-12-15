@@ -3,7 +3,7 @@ import { Tag } from 'antd';
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
-
+import EditForm from '../../forms/EdtiForm'
 export default function Lead() {
   const translate = useLanguage();
   const entity = 'lead';
@@ -297,7 +297,7 @@ export default function Lead() {
   return (
     <CrudModule
       createForm={<LeadForm />}
-      updateForm={<LeadForm isUpdateForm={true} />}
+      updateForm={<EditForm isUpdateForm={true} />}
       config={config}
     />
   );
