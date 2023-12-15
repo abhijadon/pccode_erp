@@ -192,7 +192,7 @@ export default function LeadForm() {
   return (
     <div>
       <form>
-        <Form.Item label="Select Institute" name="customfields.institute">
+        <Form.Item label="Select Institute" name="customfields.institute_name">
           <Select onChange={handleInstituteChange} placeholder="--Select Institute--">
             {formData.map((item) => (
               <Option key={item.value} value={item.value}>

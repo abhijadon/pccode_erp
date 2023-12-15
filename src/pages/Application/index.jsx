@@ -16,97 +16,98 @@ export default function Lead() {
 
   const readColumns = [
     {
-      title: translate('University Name'),
-      dataIndex: 'institute',
-    },
-    {
-      title: translate('University Name'),
-      dataIndex: 'university_name',
-    },
-
-    {
-      title: translate('Want to Send'),
-      dataIndex: 'sendfeereceipt',
-    },
-    {
       title: translate('StudentID'),
-      dataIndex: 'studentid',
+      dataIndex: 'lead_id',
     },
     {
       title: translate('Student Name'),
-      dataIndex: 'studentname',
+      dataIndex: 'full_name',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'contact.email',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'contact.phone',
+    },
+    {
+      title: translate('course'),
+      dataIndex: 'education.course',
+    },
+    {
+      title: translate('Session'),
+      dataIndex: 'customfields.session',
+    },
+    {
+      title: translate('Institute Name'),
+      dataIndex: 'customfields.institute_name',
+    },
+
+    {
+      title: translate('University name'),
+      dataIndex: 'customfields.university_name',
+    },
+
+    {
+      title: translate('counselor email'),
+      dataIndex: 'customfields.counselor_email',
     },
 
     {
       title: translate('Father Name'),
-      dataIndex: 'fatherName',
+      dataIndex: 'customfields.father_name',
     },
     {
       title: translate('Mother name'),
-      dataIndex: 'motherName',
+      dataIndex: 'customfields.mother_name',
     },
     {
-      title: translate('Email'),
-      dataIndex: 'email',
+      title: translate('Session type'),
+      dataIndex: 'customfields.session_type',
     },
     {
-      title: translate('Phone'),
-      dataIndex: 'phone',
+      title: translate('Specialization'),
+      dataIndex: 'customfields.enter_specialization',
     },
     {
-      title: translate('Dob'),
-      dataIndex: 'dob',
-      render: (date) => dayjs(date).format('DD/MM/YYYY'),
-    },
-    {
-      title: translate('counseelor email'),
-      dataIndex: 'counselorEmail',
-    },
-    {
-      title: translate('session'),
-      dataIndex: 'session',
-    },
-    {
-      title: translate('Session Type'),
-      dataIndex: 'sessionType',
-    },
-    {
-      title: translate('course'),
-      dataIndex: 'courseName',
-    },
-    {
-      title: translate('specialization'),
-      dataIndex: 'specialization',
+      title: translate('Date of birth'),
+      dataIndex: 'customfields.dob',
+      render: (dob) => (dob ? new Date(dob).toLocaleDateString() : 'N/A'),
     },
     {
       title: translate('gender'),
-      dataIndex: 'gender',
+      dataIndex: 'customfields.gender',
     },
     {
-      title: translate('installment type'),
-      dataIndex: 'installmentType',
+      title: translate('Installment type'),
+      dataIndex: 'customfields.installment_type',
     },
     {
-      title: translate('payment mode'),
-      dataIndex: 'paymentMode',
+      title: translate('Payment mode'),
+      dataIndex: 'customfields.payment_mode',
     },
+
     {
-      title: translate('total course fee'),
-      dataIndex: 'totalCourseFee',
-    },
-    {
-      title: translate('Total paid amount'),
-      dataIndex: 'totalPaidAmount',
+      title: translate('Total Course Fee'),
+      dataIndex: 'customfields.total_course_fee',
     },
     {
       title: translate('paid amount'),
-      dataIndex: 'paidAmount',
+      dataIndex: 'customfields.paid_amount',
     },
     {
-      title: translate('Due fee amount'),
-      dataIndex: 'duefeeAmount',
+      title: translate('Due amount'),
+      dataIndex: 'customfields.due_amount',
     },
-
+    {
+      title: translate('Total Paid amount'),
+      dataIndex: 'customfields.total_paid_amount',
+    },
+    {
+      title: translate('Send Fee Receipt'),
+      dataIndex: 'customfields.send_fee_receipt',
+    },
     {
       title: translate('status'),
       dataIndex: 'status',
@@ -151,8 +152,8 @@ export default function Lead() {
     },
     {
       title: translate('Institute Name'),
-      dataIndex: ['customfields', 'institute'],
-      key: 'institute'
+      dataIndex: ['customfields', 'institute_name'],
+      key: 'institute_name'
     },
 
     {
@@ -163,8 +164,8 @@ export default function Lead() {
 
     {
       title: translate('Counselor Email'),
-      dataIndex: ['customfields', 'counselorEmail'],
-      key: 'counselorEmail'
+      dataIndex: ['customfields', 'counselor_email'],
+      key: 'counselor_email'
     },
     {
       title: translate('Lms'),
@@ -182,13 +183,13 @@ export default function Lead() {
     },
     {
       title: translate('Session type'),
-      dataIndex: ['customfields', 'sessionType'],
+      dataIndex: ['customfields', 'session_type'],
       key: 'sessionType'
     },
     {
       title: translate('Specialization'),
-      dataIndex: ['education', 'specialization'],
-      key: 'specialization'
+      dataIndex: ['customfields', 'enter_specialization'],
+      key: 'enter_specialization'
     },
     {
       title: translate('Date of birth'),
@@ -204,48 +205,49 @@ export default function Lead() {
 
     {
       title: translate('Installment type'),
-      dataIndex: ['customfields', 'installmentType'],
+      dataIndex: ['customfields', 'installment_type'],
       key: 'installmentType'
     },
 
     {
       title: translate('Payment mode'),
-      dataIndex: ['customfields', 'paymentMode'],
-      key: 'paymentMode'
+      dataIndex: ['customfields', 'payment_mode'],
+      key: 'payment_mode'
     },
     {
-      title: translate('Total amount'),
-      dataIndex: ['customfields', 'totalPaidAmount'],
-      key: 'totalPaidAmount'
+      title: translate('Total Course Fee'),
+      dataIndex: ['customfields', 'total_course_fee'],
+      key: 'total_course_fee'
     },
     {
       title: translate('paid amount'),
-      dataIndex: ['customfields', 'paidAmount'],
-      key: 'paidAmount'
+      dataIndex: ['customfields', 'paid_amount'],
+      key: 'paid_amount'
     },
     {
       title: translate('Due amount'),
-      dataIndex: ['customfields', 'duefeeAmount'],
-      key: 'interestedLoan'
+      dataIndex: ['customfields', 'due_amount'],
+      key: 'due_amount'
     },
     {
-      title: translate('Interested Loan'),
-      dataIndex: ['customfields', 'interestedLoan'],
-      key: 'interestedLoan'
+      title: translate('Total Paid amount'),
+      dataIndex: ['customfields', 'total_paid_amount'],
+      key: 'total_paid_amount'
     },
     {
-      title: translate('Additional comments'),
-      dataIndex: ['customfields', 'interestedLoan'],
-      key: 'interestedLoan'
+      title: translate('Fee receipt screenshot'),
+      dataIndex: ['customfields', 'upload_fee_receipt_screenshot'],
+      key: 'upload_fee_receipt_screenshot'
     },
     {
-      title: translate('Document img1'),
-      dataIndex: ['file1'],
+      title: translate('Student document'),
+      dataIndex: ['customfields', 'upload_student_document'],
+      key: 'upload_student_document'
     },
     {
       title: 'Send Fee Receipt',
-      dataIndex: ['customfields', 'sendfeereceipt'],
-      key: 'sendfeereceipt',
+      dataIndex: ['customfields', 'send_fee_receipt'],
+      key: 'send_fee_receipt',
     },
 
     {
