@@ -1,12 +1,13 @@
-import dayjs from 'dayjs';
-import { Tag, Image, Space } from 'antd';
 import {
-  DownloadOutlined,
+  DownloadOutlined, ZoomInOutlined,
+  ZoomOutOutlined, PrinterOutlined
 } from '@ant-design/icons';
+import { Tag, Image, Space } from 'antd';
+import dayjs from 'dayjs'; // Import dayjs if not already imported
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
-import EditForm from '../../forms/EdtiForm'
+import EditForm from '../../forms/EdtiForm';
 
 export default function Lead() {
   const translate = useLanguage();
@@ -17,19 +18,36 @@ export default function Lead() {
     outputValue: '_id',
   };
 
-  const downloadImage = (base64ImageData, imageName) => {
-    const byteString = atob(base64ImageData.split(',')[1]);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const uint8Array = new Uint8Array(arrayBuffer);
-    for (let i = 0; i < byteString.length; i++) {
-      uint8Array[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([arrayBuffer], { type: 'image/png' });
 
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = imageName;
-    link.click();
+  const handleDownload = (base64ImageData, imageName) => {
+    try {
+      const byteString = atob(base64ImageData);
+
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([uint8Array], { type: 'image/png' });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = imageName;
+      document.body.appendChild(link);
+      link.click();
+      URL.revokeObjectURL(url);
+      link.remove();
+    } catch (error) {
+      console.error('Error while handling download:', error);
+    }
+  };
+
+  const handlePrint = (base64ImageData) => {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<img src="data:image/png;base64,${base64ImageData}" style="max-width:100%;" />`);
+    printWindow.document.close();
+    printWindow.print();
   };
   const entityDisplayLabels = ['number', 'company'];
 
@@ -269,14 +287,22 @@ export default function Lead() {
               alt="Lead"
               style={{ width: '50px', height: '50px' }}
               preview={{
-                mask: (
-                  <Space direction="horizontal" size="large">
-                    <DownloadOutlined
-                      onClick={() => downloadImage(img.data, img.name)}
-                      style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
-                    />
-                  </Space>
-                ),
+                toolbarRender: (_, { onZoomIn, onZoomOut }) => {
+                  return (
+                    <Space direction="horizontal" size="large">
+                      {/* Download button within the preview toolbar */}
+                      <DownloadOutlined
+                        onClick={() => handleDownload(img.data, img.name)}
+                        style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
+                      />
+                      {/* Other toolbar buttons */}
+                      <ZoomInOutlined onClick={onZoomIn} />
+                      <ZoomOutOutlined onClick={onZoomOut} />
+                      {/* ... other buttons */}
+                      <PrinterOutlined onClick={() => handlePrint(img.data)} />
+                    </Space>
+                  );
+                },
               }}
             />
           </div>
