@@ -180,12 +180,12 @@ const formData = [
             type: 'email',
           },
           {
-            key: 'text',
+            key: 'file',
             label: 'Upload Fee Receipt Screenshot',
-            name: 'customfields.upload_fee_receipt_screenshot',
+            name: 'image',
             place: 'Enter Counselor Email',
             id: 'Upload Fee Receipt Screenshot',
-            type: 'text',
+            type: 'file',
           },
           {
             key: 'text',

@@ -1,9 +1,13 @@
 import dayjs from 'dayjs';
-import { Tag } from 'antd';
+import { Tag, Image, Space } from 'antd';
+import {
+  DownloadOutlined,
+} from '@ant-design/icons';
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
 import EditForm from '../../forms/EdtiForm'
+
 export default function Lead() {
   const translate = useLanguage();
   const entity = 'lead';
@@ -11,6 +15,21 @@ export default function Lead() {
     displayLabels: ['full_name', 'company', 'contact.email'],
     searchFields: ['full_name', 'company', 'contact.email'],
     outputValue: '_id',
+  };
+
+  const downloadImage = (base64ImageData, imageName) => {
+    const byteString = atob(base64ImageData.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      uint8Array[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([arrayBuffer], { type: 'image/png' });
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = imageName;
+    link.click();
   };
   const entityDisplayLabels = ['number', 'company'];
 
@@ -240,9 +259,31 @@ export default function Lead() {
       key: 'upload_fee_receipt_screenshot'
     },
     {
-      title: translate('Student document'),
-      dataIndex: ['customfields', 'upload_student_document'],
-      key: 'upload_student_document'
+      title: 'Image',
+      dataIndex: 'img',
+      render: (img) => {
+        return img ? (
+          <div>
+            <Image
+              src={`data:${img.contentType};base64,${img.data}`}
+              alt="Lead"
+              style={{ width: '50px', height: '50px' }}
+              preview={{
+                mask: (
+                  <Space direction="horizontal" size="large">
+                    <DownloadOutlined
+                      onClick={() => downloadImage(img.data, img.name)}
+                      style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
+                    />
+                  </Space>
+                ),
+              }}
+            />
+          </div>
+        ) : (
+          <span>No Image</span>
+        );
+      },
     },
     {
       title: 'Send Fee Receipt',

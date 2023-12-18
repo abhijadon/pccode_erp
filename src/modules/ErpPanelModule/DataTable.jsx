@@ -199,24 +199,24 @@ export default function DataTable({ config, extra = [] }) {
         expandable={
           expandedRowData.length
             ? {
-                expandedRowRender: (record) => (
-                  <Descriptions title="" bordered column={1}>
-                    {expandedRowData.map((item, index) => {
-                      return (
-                        <Descriptions.Item key={index} label={item.title}>
-                          {item.render?.(record[item.dataIndex])?.children
-                            ? item.render?.(record[item.dataIndex])?.children
-                            : item.render?.(record[item.dataIndex])
+              expandedRowRender: (record) => (
+                <Descriptions title="" bordered column={1}>
+                  {expandedRowData.map((item, index) => {
+                    return (
+                      <Descriptions.Item key={index} label={item.title}>
+                        {item.render?.(record[item.dataIndex])?.children
+                          ? item.render?.(record[item.dataIndex])?.children
+                          : item.render?.(record[item.dataIndex])
                             ? item.render?.(record[item.dataIndex])
                             : Array.isArray(item.dataIndex)
-                            ? record[item.dataIndex[0]]?.[item.dataIndex[1]]
-                            : record[item.dataIndex]}
-                        </Descriptions.Item>
-                      );
-                    })}
-                  </Descriptions>
-                ),
-              }
+                              ? record[item.dataIndex[0]]?.[item.dataIndex[1]]
+                              : record[item.dataIndex]}
+                      </Descriptions.Item>
+                    );
+                  })}
+                </Descriptions>
+              ),
+            }
             : null
         }
       />
