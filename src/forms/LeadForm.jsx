@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Form, Select, Input, Checkbox, Radio, DatePicker, Upload, message } from 'antd';
+import { Form, Select, Input, Checkbox, Radio, DatePicker, Upload } from 'antd';
 import formData from './formData';
+import { UploadOutlined } from '@ant-design/icons';
+import useLanguage from '@/locale/useLanguage';
 const { Option } = Select;
 // Inside the component
 
@@ -9,6 +11,13 @@ export default function LeadForm() {
   const [selectedInstitute, setSelectedInstitute] = useState(null);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [studentId, setStudentId] = useState('');
+  const translate = useLanguage();
+  const normFile = (e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  };
 
   useEffect(() => {
     if (selectedInstitute && selectedUniversity) {
@@ -144,32 +153,24 @@ export default function LeadForm() {
         case 'file':
           return (
             <Form.Item
-              key={field.id}
-              label={field.label}
-              name={field.name}
+              label={translate('Image')}
+              name="image"
               valuePropName="fileList"
-              getValueFromEvent={(e) => {
-                if (Array.isArray(e)) {
-                  return e;
-                }
-                return e && e.fileList;
-              }}
+              getValueFromEvent={normFile}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please upload an image',
+                },
+              ]}
             >
               <Upload
+                name="logo"
+                listType="picture"
                 beforeUpload={() => false}
-                onChange={(info) => {
-                  if (info.file.status !== 'uploading') {
-                    console.log(info.file, info.fileList);
-                  }
-                  if (info.file.status === 'done') {
-                    message.success(`${info.file.name} file uploaded successfully`);
-                  } else if (info.file.status === 'error') {
-                    message.error(`${info.file.name} file upload failed.`);
-                  }
-                }}
-                fileList={[]}
+                multiple={false}
               >
-                <span>Click to Upload</span>
+                <UploadOutlined /> Upload
               </Upload>
             </Form.Item>
           );

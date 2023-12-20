@@ -21,16 +21,9 @@ export default function Lead() {
 
   const handleDownload = (base64ImageData, imageName) => {
     try {
-      const byteString = atob(base64ImageData);
-
-      const arrayBuffer = new ArrayBuffer(byteString.length);
-      const uint8Array = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-        uint8Array[i] = byteString.charCodeAt(i);
-      }
-      const blob = new Blob([uint8Array], { type: 'image/png' });
-
+      const blob = base64ToBlob(base64ImageData);
       const url = URL.createObjectURL(blob);
+
       const link = document.createElement('a');
       link.href = url;
       link.download = imageName;
@@ -49,6 +42,25 @@ export default function Lead() {
     printWindow.document.close();
     printWindow.print();
   };
+
+  function base64ToBlob(base64ImageData) {
+    const byteCharacters = atob(base64ImageData);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+      const slice = byteCharacters.slice(offset, offset + 512);
+
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, { type: 'image/png' });
+  }
   const entityDisplayLabels = ['number', 'company'];
 
   const readColumns = [
@@ -278,38 +290,11 @@ export default function Lead() {
     },
     {
       title: 'Image',
-      dataIndex: 'img',
-      render: (img) => {
-        return img ? (
-          <div>
-            <Image
-              src={`data:${img.contentType};base64,${img.data}`}
-              alt="Lead"
-              style={{ width: '50px', height: '50px' }}
-              preview={{
-                toolbarRender: (_, { onZoomIn, onZoomOut }) => {
-                  return (
-                    <Space direction="horizontal" size="large">
-                      {/* Download button within the preview toolbar */}
-                      <DownloadOutlined
-                        onClick={() => handleDownload(img.data, img.name)}
-                        style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
-                      />
-                      {/* Other toolbar buttons */}
-                      <ZoomInOutlined onClick={onZoomIn} />
-                      <ZoomOutOutlined onClick={onZoomOut} />
-                      {/* ... other buttons */}
-                      <PrinterOutlined onClick={() => handlePrint(img.data)} />
-                    </Space>
-                  );
-                },
-              }}
-            />
-          </div>
-        ) : (
-          <span>No Image</span>
-        );
-      },
+      dataIndex: 'image', // Assuming 'image' is the field containing the image data
+      key: 'image',
+      render: (imageData) => (
+        <Image src={imageData && imageData.length > 0 ? imageData[0].thumbUrl : ''} alt="Lead Image" style={{ maxWidth: '50px' }} />
+      ),
     },
     {
       title: 'Send Fee Receipt',
@@ -368,4 +353,16 @@ export default function Lead() {
       config={config}
     />
   );
+}
+
+function arrayBufferToBase64(buffer) {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(binary);
 }
