@@ -19,48 +19,55 @@ export default function Lead() {
   };
 
 
+
   const handleDownload = (base64ImageData, imageName) => {
     try {
-      const blob = base64ToBlob(base64ImageData);
-      const url = URL.createObjectURL(blob);
+      // Check if the provided data is a valid Base64 string
+      const isBase64 = /^data:image\/([a-zA-Z]*);base64,([^\/\r\n]*)/.test(base64ImageData);
 
+      if (!isBase64) {
+        console.error('Invalid Base64 data provided.');
+        return;
+      }
+
+      // Convert the Base64 string to a Blob
+      const byteCharacters = atob(base64ImageData.split(',')[1]);
+      const byteArrays = [];
+      for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+        const slice = byteCharacters.slice(offset, offset + 512);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }
+      const blob = new Blob(byteArrays, { type: 'image/png' });
+
+      // Create an object URL from the Blob and trigger download
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = imageName;
-      document.body.appendChild(link);
+      link.download = imageName || 'image'; // Set default name if imageName is missing
       link.click();
+
+      // Clean up resources
       URL.revokeObjectURL(url);
-      link.remove();
     } catch (error) {
       console.error('Error while handling download:', error);
     }
   };
-
-  const handlePrint = (base64ImageData) => {
+  const handlePrint = (imageUrl) => {
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(`<img src="data:image/png;base64,${base64ImageData}" style="max-width:100%;" />`);
+    printWindow.document.write(
+      `<img src="${imageUrl}" style="max-width:100%;" />`
+    );
     printWindow.document.close();
     printWindow.print();
   };
 
-  function base64ToBlob(base64ImageData) {
-    const byteCharacters = atob(base64ImageData);
-    const byteArrays = [];
 
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-      const slice = byteCharacters.slice(offset, offset + 512);
 
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    return new Blob(byteArrays, { type: 'image/png' });
-  }
   const entityDisplayLabels = ['number', 'company'];
 
   const readColumns = [
@@ -290,11 +297,39 @@ export default function Lead() {
     },
     {
       title: 'Image',
-      dataIndex: 'image', // Assuming 'image' is the field containing the image data
+      dataIndex: 'image',
       key: 'image',
-      render: (imageData) => (
-        <Image src={imageData && imageData.length > 0 ? imageData[0].thumbUrl : ''} alt="Lead Image" style={{ maxWidth: '50px' }} />
-      ),
+      render: (imageData) => {
+        if (imageData && Array.isArray(imageData) && imageData.length > 0) {
+          const img = imageData[0]; // Assuming imageData[0] contains the image data
+          return (
+            <Image
+              src={img.thumbUrl || ''}
+              alt={img.name || 'Lead Image'}
+              style={{ maxWidth: '50px' }}
+              preview={{
+                onPreview: () => {
+                  // Handle preview logic here if needed
+                },
+                toolbarRender: (_, { onZoomIn, onZoomOut }) => (
+                  <Space direction="horizontal" size="large">
+                    <DownloadOutlined
+                      onClick={() => {
+                        handleDownload(img.thumbUrl, img.name);
+                      }}
+                      style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
+                    />
+                    <ZoomInOutlined onClick={onZoomIn} />
+                    <ZoomOutOutlined onClick={onZoomOut} />
+                    <PrinterOutlined onClick={() => handlePrint(img.thumbUrl)} />
+                  </Space>
+                ),
+              }}
+            />
+          );
+        }
+        return null;
+      },
     },
     {
       title: 'Send Fee Receipt',
@@ -355,14 +390,3 @@ export default function Lead() {
   );
 }
 
-function arrayBufferToBase64(buffer) {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-
-  return btoa(binary);
-}
