@@ -1,9 +1,15 @@
-import { Form, Input } from 'antd';
-
+import { Form, Input, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
 
 export default function LeadForm() {
     const translate = useLanguage();
+    const normFile = (e) => {
+        if (Array.isArray(e)) {
+            return e;
+        }
+        return e && e.fileList;
+    };
     return (
         <>
             <Form.Item
@@ -177,11 +183,6 @@ export default function LeadForm() {
             <Form.Item
                 label={translate('date of birth')}
                 name={['customfields', 'dob']}
-                rules={[
-                    {
-                        required: true,
-                    },
-                ]}
             >
                 <Input />
             </Form.Item>
@@ -277,15 +278,25 @@ export default function LeadForm() {
                 <Input />
             </Form.Item>
             <Form.Item
-                label={translate('Student Document')}
-                name={['customfields', 'upload_student_document']}
+                label={translate('Image')}
+                name="image"
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
                 rules={[
                     {
                         required: true,
+                        message: 'Please upload an image',
                     },
                 ]}
             >
-                <Input />
+                <Upload
+                    name="logo"
+                    listType="picture"
+                    beforeUpload={() => false}
+                    multiple={false}
+                >
+                    <UploadOutlined /> Upload
+                </Upload>
             </Form.Item>
         </>
     );
