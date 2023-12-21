@@ -13,6 +13,17 @@
   border-right: 1px solid #edf0f5;
   color: #4f5d75;
 }
+
+:where(.css-dev-only-do-not-override-2i2tap).ant-modal .ant-modal-close{
+  background: red;
+}
+/* :where(.css-dev-only-do-not-override-2i2tap).ant-btn.ant-btn-icon-only {
+  background: transparent !important;
+  border: none;
+  color: black !important;
+  font-size: large;
+  display: flex;
+} */
 .ant-layout-sider-zero-width-trigger {
   top: 5px;
   right: 10px;

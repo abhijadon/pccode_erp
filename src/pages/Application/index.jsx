@@ -1,16 +1,36 @@
 import {
-  DownloadOutlined, ZoomInOutlined,
-  ZoomOutOutlined, PrinterOutlined
+  DownloadOutlined, LeftOutlined, RightOutlined
+  , PrinterOutlined
 } from '@ant-design/icons';
-import { Tag, Image, Space } from 'antd';
+import { Tag, Modal, Image, Space, Button } from 'antd';
 import dayjs from 'dayjs'; // Import dayjs if not already imported
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
 import EditForm from '../../forms/EdtiForm';
-
+import { useState } from 'react';
 export default function Lead() {
   const translate = useLanguage();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleImagePreview = (imageData, index) => {
+    setPreviewImages(imageData);
+    setCurrentImageIndex(index);
+    setPreviewVisible(true);
+  };
+
+  const handleNext = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % previewImages.length);
+  };
+
+  const handlePrevious = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? previewImages.length - 1 : prevIndex - 1
+    );
+  };
+
   const entity = 'lead';
   const searchConfig = {
     displayLabels: ['full_name', 'company', 'contact.email'],
@@ -299,33 +319,21 @@ export default function Lead() {
       title: 'Image',
       dataIndex: 'image',
       key: 'image',
-      render: (imageData) => {
-        if (imageData && Array.isArray(imageData) && imageData.length > 0) {
-          const img = imageData[0]; // Assuming imageData[0] contains the image data
+      render: (imageData, record, index) => {
+        if (Array.isArray(imageData) && imageData.length > 0) {
           return (
-            <Image
-              src={img.thumbUrl || ''}
-              alt={img.name || 'Lead Image'}
-              style={{ maxWidth: '50px' }}
-              preview={{
-                onPreview: () => {
-                  // Handle preview logic here if needed
-                },
-                toolbarRender: (_, { onZoomIn, onZoomOut }) => (
-                  <Space direction="horizontal" size="large">
-                    <DownloadOutlined
-                      onClick={() => {
-                        handleDownload(img.thumbUrl, img.name);
-                      }}
-                      style={{ fontSize: '20px', color: 'white', cursor: 'pointer' }}
-                    />
-                    <ZoomInOutlined onClick={onZoomIn} />
-                    <ZoomOutOutlined onClick={onZoomOut} />
-                    <PrinterOutlined onClick={() => handlePrint(img.thumbUrl)} />
-                  </Space>
-                ),
-              }}
-            />
+            <div style={{ display: 'flex' }}>
+              {imageData.map((img, idx) => (
+                <div key={idx} style={{ marginRight: '5px' }}>
+                  <img
+                    src={img.thumbUrl || ''}
+                    alt={img.name || `Image ${idx}`}
+                    style={{ maxWidth: '50px', cursor: 'pointer' }}
+                    onClick={() => handleImagePreview(imageData, idx)}
+                  />
+                </div>
+              ))}
+            </div>
           );
         }
         return null;
@@ -382,11 +390,94 @@ export default function Lead() {
     entityDisplayLabels,
   };
   return (
-    <CrudModule
-      createForm={<LeadForm />}
-      updateForm={<EditForm isUpdateForm={true} />}
-      config={config}
-    />
+    <>
+
+      <Modal
+        visible={previewVisible}
+        onCancel={() => setPreviewVisible(false)}
+        footer={null}
+        width={800}
+        centered
+      >
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', position: 'relative' }}>
+            <Image
+              src={previewImages[currentImageIndex]?.thumbUrl || ''}
+              alt={previewImages[currentImageIndex]?.name || 'Preview'}
+              style={{ maxWidth: '100%', maxHeight: '70vh' }}
+              preview={{
+                mask: (
+                  <>
+
+                  </>
+                ),
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '440px', // Adjusted width to accommodate 10px gap on each side
+                left: '-100px', // 10px gap on the left side
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Button onClick={handlePrevious} icon={<LeftOutlined />} />
+              <Button onClick={handleNext} icon={<RightOutlined />} />
+            </div>
+
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignContent: 'center',
+            gap: '10px',
+            position: 'absolute',
+            top: '8px',
+            borderRadius: '5px',
+            left: 0,
+            padding: '2px',
+
+          }}
+        >
+          <PrinterOutlined
+            onClick={() =>
+              handlePrint(previewImages[currentImageIndex]?.thumbUrl)
+            }
+            style={{
+              fontSize: '20px',
+              color: '#083662',
+              cursor: 'pointer',
+            }}
+          />
+
+          <DownloadOutlined
+            onClick={() =>
+              handleDownload(
+                previewImages[currentImageIndex]?.thumbUrl,
+                previewImages[currentImageIndex]?.name
+              )
+            }
+            style={{
+              fontSize: '20px',
+              color: '#083662',
+              cursor: 'pointer',
+            }}
+          />
+        </div>
+
+      </Modal>
+
+      <CrudModule
+        createForm={<LeadForm />}
+        updateForm={<EditForm isUpdateForm={true} />}
+        config={config}
+      />
+    </>
   );
 }
 

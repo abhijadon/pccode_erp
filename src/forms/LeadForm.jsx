@@ -14,11 +14,10 @@ export default function LeadForm() {
   const translate = useLanguage();
   const normFile = (e) => {
     if (Array.isArray(e)) {
-      return e;
+      return e.map(file => file.fileList);
     }
     return e && e.fileList;
   };
-
   useEffect(() => {
     if (selectedInstitute && selectedUniversity) {
       setStudentId(generateUniqueId());
@@ -168,7 +167,7 @@ export default function LeadForm() {
                 name="logo"
                 listType="picture"
                 beforeUpload={() => false}
-                multiple={false}
+                multiple={true} // Enable multiple file selection
               >
                 <UploadOutlined /> Upload
               </Upload>
