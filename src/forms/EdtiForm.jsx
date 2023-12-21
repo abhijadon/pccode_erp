@@ -1,4 +1,4 @@
-import { Form, Input, Upload } from 'antd';
+import { Form, Input, Upload, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
 
@@ -297,6 +297,24 @@ export default function LeadForm() {
                 >
                     <UploadOutlined /> Upload
                 </Upload>
+            </Form.Item>
+            <Form.Item
+                label={translate('status')}
+                name={['customfields', 'status']}
+                rules={[
+                    {
+                        required: false,
+                    },
+                ]}
+            >
+                <Select
+                    options={[
+                        { value: 'New', label: translate('New') },
+                        { value: 'Cancel', label: translate('cancel') },
+                        { value: 'Alumini', label: translate('Alumini') },
+                        { value: 'not interested', label: translate('not interested') },
+                    ]}
+                ></Select>
             </Form.Item>
         </>
     );

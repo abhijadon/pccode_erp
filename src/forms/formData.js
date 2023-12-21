@@ -195,6 +195,14 @@ const formData = [
             id: 'Uplaod Student Document',
             type: 'text',
           },
+          {
+            key: 'select ',
+            label: 'Status',
+            name: 'customfields.status',
+            id: 'status ',
+            type: 'select',
+            options: ['New', 'Cancel', 'Alumini', 'Deactive'],
+          },
         ],
       },
       {

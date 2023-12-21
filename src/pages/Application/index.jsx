@@ -316,7 +316,7 @@ export default function Lead() {
       key: 'upload_fee_receipt_screenshot'
     },
     {
-      title: 'Image',
+      title: translate('Student Document'),
       dataIndex: 'image',
       key: 'image',
       render: (imageData, record, index) => {
@@ -347,16 +347,16 @@ export default function Lead() {
 
     {
       title: translate('Status'),
-      dataIndex: 'status',
+      dataIndex: ['customfields', 'status'],
       render: (status) => {
         let color =
-          status === 'new'
+          status === 'New'
             ? 'cyan'
-            : status === 'Enrolled'
+            : status === 'Cancel'
               ? 'blue'
               : status === 'Alumini'
                 ? 'green'
-                : status === 'Cancel'
+                : status === 'Not Intrested'
                   ? 'orange'
                   : 'red';
         return <Tag color={color}>{status && translate(status)}</Tag>;

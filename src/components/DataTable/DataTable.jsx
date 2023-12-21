@@ -31,6 +31,8 @@ export default function DataTable({ config, extra = [] }) {
   const [searchValue, setSearchValue] = useState('');
   const [selectedInstitute, setSelectedInstitute] = useState('');
   const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [selectedSession, setSelectedSession] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -167,11 +169,25 @@ export default function DataTable({ config, extra = [] }) {
     { label: 'DES', value: 'DES' },
     // Add more institute options as needed
   ];
+
+  const sessionOptions = [
+    { label: '2023', value: '2023' },
+    { label: '2024', value: '2024' },
+    // Add more institute options as needed
+  ];
+
+  const statusOptions = [
+    { label: 'New', value: 'New' },
+    { label: 'Cancel', value: 'Cancel' },
+    // Add more institute options as needed
+  ];
   // Reset filters function
   const handleResetFilters = () => {
     setSelectedInstitute('');
     setSelectedUniversity('');
     setSearchValue('');
+    setSelectedSession('');
+    setSelectedStatus('');
   };
   // Reset filters function
   const handleReset1 = () => {
@@ -180,6 +196,15 @@ export default function DataTable({ config, extra = [] }) {
   // Reset filters function
   const handleReset2 = () => {
     setSelectedUniversity('');
+  };
+
+  // Reset filters function
+  const handleReset3 = () => {
+    setSelectedSession('');
+  };
+  // Reset filters function
+  const handleReset4 = () => {
+    setSelectedStatus('');
   };
   // Function to handle institute filter selection
   const handleInstituteChange = (value) => {
@@ -191,6 +216,16 @@ export default function DataTable({ config, extra = [] }) {
     setSelectedUniversity(value);
   };
 
+  // Function to handle university filter selection
+  const handleSessionChange = (value) => {
+    setSelectedSession(value);
+  };
+
+  // Function to handle university filter selection
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+  };
+
   const applyFilters = (data) => {
     let filteredData = [...data];
 
@@ -198,8 +233,8 @@ export default function DataTable({ config, extra = [] }) {
       filteredData = filteredData.filter(
         (item) =>
           item.customfields &&
-          item.customfields.institute && // Correct the key to 'institue' instead of 'institute'
-          item.customfields.institute.toLowerCase() === selectedInstitute.toLowerCase()
+          item.customfields.institute_name && // Correct the key to 'institue' instead of 'institute'
+          item.customfields.institute_name.toLowerCase() === selectedInstitute.toLowerCase()
       );
     }
 
@@ -209,6 +244,24 @@ export default function DataTable({ config, extra = [] }) {
           item.customfields &&
           item.customfields.university_name &&
           item.customfields.university_name.toLowerCase() === selectedUniversity.toLowerCase()
+      );
+    }
+
+    if (selectedSession !== '') {
+      filteredData = filteredData.filter(
+        (item) =>
+          item.customfields &&
+          item.customfields.session &&
+          item.customfields.session.toLowerCase() === selectedSession.toLowerCase()
+      );
+    }
+
+    if (selectedStatus !== '') {
+      filteredData = filteredData.filter(
+        (item) =>
+          item.customfields &&
+          item.customfields.status &&
+          item.customfields.status.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
     return filteredData;
@@ -246,11 +299,13 @@ export default function DataTable({ config, extra = [] }) {
       <div className='-mt-6'>
         {/* Filter condition using select for Institute */}
         <div className='flex justify-between mb-24 items-center'>
-          <div className='flex gap-5'>
+          <div className='grid grid-cols-3 gap-4'>
             <div>
+
+              {/* Institute wise filter  */}
               <h3>Filter by Institute</h3>
               <Select
-                style={{ width: 200 }}
+                style={{ width: 170 }}
                 placeholder="Select Institute"
                 onChange={handleInstituteChange}
                 value={selectedInstitute}
@@ -263,10 +318,12 @@ export default function DataTable({ config, extra = [] }) {
               </Select>
               <p onClick={handleReset1} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
             </div>
+
+            {/* University wise  */}
             <div>
               <h3>Filter by University</h3>
               <Select
-                style={{ width: 200 }}
+                style={{ width: 170 }}
                 placeholder="Select University"
                 onChange={handleUniversityChange}
                 value={selectedUniversity}
@@ -279,9 +336,44 @@ export default function DataTable({ config, extra = [] }) {
               </Select>
               <p onClick={handleReset2} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
             </div>
+
+            {/* Session wise  */}
+            <div>
+              <h3>Session</h3>
+              <Select
+                style={{ width: 170 }}
+                placeholder="Select Session"
+                onChange={handleSessionChange}
+                value={selectedSession}
+              >
+                {sessionOptions.map((option) => (
+                  <Select.Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              <p onClick={handleReset3} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
+            </div>
+            {/* Status wise  */}
+            <div>
+              <h3>Status</h3>
+              <Select
+                style={{ width: 170 }}
+                placeholder="Select Session"
+                onChange={handleStatusChange}
+                value={selectedStatus}
+              >
+                {statusOptions.map((option) => (
+                  <Select.Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+              <p onClick={handleReset4} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
+            </div>
           </div>
 
-          <div className='w-1/4 flex gap-3 '>
+          <div className='w-1/4 flex gap-3 relative top-[-50px]'>
             <label htmlFor="Search">Search
               <Input.Search
                 placeholder="Search"
