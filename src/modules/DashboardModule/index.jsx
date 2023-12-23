@@ -3,9 +3,7 @@ import useLanguage from '@/locale/useLanguage';
 import { useMoney } from '@/settings';
 import { request } from '@/request';
 import useFetch from '@/hooks/useFetch';
-
 import RecentTable from './components/RecentTable';
-
 import SummaryCard from './components/SummaryCard';
 import PreviewCard from './components/PreviewCard';
 import CustomerPreviewCard from './components/CustomerPreviewCard';

@@ -13,8 +13,8 @@ export default function Payment() {
   const entityDisplayLabels = ['number'];
   const dataTableColumns = [
     {
-      title: translate('Number'),
-      dataIndex: 'number',
+      title: translate('studentID'),
+      dataIndex: 'lead_id',
     },
     {
       title: translate('Total paid amount'),
@@ -32,8 +32,11 @@ export default function Payment() {
       },
     },
     {
-      title: translate('year'),
-      dataIndex: ['invoice', 'year'],
+      title: translate('Update Date'),
+      dataIndex: 'updated',
+      render: (date) => {
+        return dayjs(date).format('DD/MM/YYYY');
+      },
     },
     {
       title: translate('Payment Mode'),
