@@ -1,5 +1,4 @@
 import { notification } from 'antd';
-
 import codeMessage from './codeMessage';
 
 const successHandler = (response, options = { notifyOnSuccess: false, notifyOnFailed: true }) => {

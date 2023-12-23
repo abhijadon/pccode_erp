@@ -42,8 +42,8 @@ export default function CustomerPreviewCard({
                   activeCustomer > 0
                     ? { color: '#3f8600' }
                     : activeCustomer < 0
-                    ? { color: '#cf1322' }
-                    : { color: '#000000' }
+                      ? { color: '#cf1322' }
+                      : { color: '#000000' }
                 }
                 prefix={
                   activeCustomer > 0 ? (

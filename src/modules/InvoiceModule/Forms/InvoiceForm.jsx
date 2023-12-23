@@ -37,7 +37,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [lastNumber, setLastNumber] = useState(() => last_invoice_number + 1);
   const handelTaxChange = (value) => {
-    setTaxRate(value/100);
+    setTaxRate(value / 100);
   };
 
   useEffect(() => {
@@ -67,17 +67,13 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
           <Form.Item
             name="client"
             label={translate('Client')}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
+
           >
             <AutoCompleteAsync
               entity={'client'}
               displayLabels={['company']}
               searchFields={'company'}
-              // onUpdateValue={autoCompleteUpdate}
+            // onUpdateValue={autoCompleteUpdate}
             />
           </Form.Item>
         </Col>
@@ -86,11 +82,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
             label={translate('number')}
             name="number"
             initialValue={lastNumber}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
+
           >
             <InputNumber min={1} style={{ width: '100%' }} />
           </Form.Item>
@@ -100,11 +92,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
             label={translate('year')}
             name="year"
             initialValue={currentYear}
-            rules={[
-              {
-                required: true,
-              },
-            ]}
+
           >
             <InputNumber style={{ width: '100%' }} />
           </Form.Item>
@@ -113,11 +101,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
           <Form.Item
             label={translate('status')}
             name="status"
-            rules={[
-              {
-                required: false,
-              },
-            ]}
+
             initialValue={'draft'}
           >
             <Select
@@ -138,12 +122,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
           <Form.Item
             name="date"
             label={translate('Date')}
-            rules={[
-              {
-                required: true,
-                type: 'object',
-              },
-            ]}
+
             initialValue={dayjs()}
           >
             <DatePicker style={{ width: '100%' }} format={'DD/MM/YYYY'} />
@@ -153,12 +132,7 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
           <Form.Item
             name="expiredDate"
             label={translate('Expire Date')}
-            rules={[
-              {
-                required: true,
-                type: 'object',
-              },
-            ]}
+
             initialValue={dayjs().add(30, 'days')}
           >
             <DatePicker style={{ width: '100%' }} format={'DD/MM/YYYY'} />
@@ -239,16 +213,16 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
               ]}
             >
               <SelectAsync
-                  value={taxRate}
-                  onChange={handelTaxChange}
-                  bordered={false}
-                  entity={'taxes'}
-                  outputValue={'taxValue'}
-                  displayLabels={['taxName']}
-                  loadDefault={true}
-                  withRedirect={true}
-                  urlToRedirect="/taxes"
-                  redirectLabel="Add New Tax"
+                value={taxRate}
+                onChange={handelTaxChange}
+                bordered={false}
+                entity={'taxes'}
+                outputValue={'taxValue'}
+                displayLabels={['taxName']}
+                loadDefault={true}
+                withRedirect={true}
+                urlToRedirect="/taxes"
+                redirectLabel="Add New Tax"
               />
             </Form.Item>
           </Col>

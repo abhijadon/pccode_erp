@@ -1,8 +1,6 @@
 import { Descriptions, Dropdown, Table } from 'antd';
-
 import { request } from '@/request';
 import useFetch from '@/hooks/useFetch';
-
 import { EllipsisOutlined, EyeOutlined, EditOutlined, FilePdfOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { erp } from '@/redux/erp/actions';
@@ -51,7 +49,7 @@ export default function RecentTable({ ...props }) {
   dataTableColumns = [
     ...dataTableColumns,
     {
-      title: '',
+      title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Dropdown

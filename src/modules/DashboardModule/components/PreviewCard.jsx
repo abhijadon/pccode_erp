@@ -26,22 +26,7 @@ const defaultStatistics = [
     tag: 'pending',
     value: 0,
   },
-  {
-    tag: 'sent',
-    value: 0,
-  },
-  {
-    tag: 'accepted',
-    value: 0,
-  },
-  {
-    tag: 'declined',
-    value: 0,
-  },
-  {
-    tag: 'expired',
-    value: 0,
-  },
+
 ];
 
 const defaultInvoiceStatistics = [
@@ -64,11 +49,7 @@ const defaultInvoiceStatistics = [
   {
     tag: 'unpaid',
     value: 0,
-  },
-  {
-    tag: 'partially',
-    value: 0,
-  },
+  }
 ];
 
 const PreviewState = ({ tag, color, value }) => {

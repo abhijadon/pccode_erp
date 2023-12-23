@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { Tag } from 'antd';
 import useLanguage from '@/locale/useLanguage';
-
 import { useMoney } from '@/settings';
 import InvoiceDataTableModule from '@/modules/InvoiceModule/InvoiceDataTableModule';
 
@@ -40,7 +39,7 @@ export default function Invoice() {
     },
     {
       title: translate('Total'),
-      dataIndex: 'total',
+      dataIndex: 'total_course_fee',
       onCell: () => {
         return {
           style: {
@@ -49,7 +48,7 @@ export default function Invoice() {
           },
         };
       },
-      render: (total) => moneyFormatter({ amount: total }),
+      render: (total_course_fee) => moneyFormatter({ amount: total_course_fee }),
     },
     {
       title: translate('credit'),
@@ -81,10 +80,10 @@ export default function Invoice() {
           paymentStatus === 'unpaid'
             ? 'volcano'
             : paymentStatus === 'paid'
-            ? 'green'
-            : paymentStatus === 'overdue'
-            ? 'red'
-            : 'purple';
+              ? 'green'
+              : paymentStatus === 'overdue'
+                ? 'red'
+                : 'purple';
 
         return <Tag color={color}>{paymentStatus && translate(paymentStatus)}</Tag>;
       },

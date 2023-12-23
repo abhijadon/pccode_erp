@@ -1,7 +1,6 @@
 import { Form, Input, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { message, Upload, Button } from 'antd';
-
 import useLanguage from '@/locale/useLanguage';
 
 const beforeUpload = (file) => {

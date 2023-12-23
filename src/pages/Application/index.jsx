@@ -2,7 +2,7 @@ import {
   DownloadOutlined, LeftOutlined, RightOutlined
   , PrinterOutlined
 } from '@ant-design/icons';
-import { Tag, Modal, Image, Space, Button } from 'antd';
+import { Tag, Modal, Image, Button } from 'antd';
 import dayjs from 'dayjs'; // Import dayjs if not already imported
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
@@ -11,14 +11,15 @@ import EditForm from '../../forms/EdtiForm';
 import { useState } from 'react';
 export default function Lead() {
   const translate = useLanguage();
-  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewVisible1, setPreviewVisible1] = useState(false);
   const [previewImages, setPreviewImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
+  const [previewVisible2, setPreviewVisible2] = useState(false); // Second Modal
+  const [studentConversation, setStudentConversation] = useState([]);
   const handleImagePreview = (imageData, index) => {
     setPreviewImages(imageData);
     setCurrentImageIndex(index);
-    setPreviewVisible(true);
+    setPreviewVisible1(true);
   };
 
   const handleNext = () => {
@@ -30,7 +31,44 @@ export default function Lead() {
       prevIndex === 0 ? previewImages.length - 1 : prevIndex - 1
     );
   };
+  const getConversationHistory = (record) => {
+    const currentRemark = record.customfields && record.customfields.remark;
+    const previousRemarks = record.previousRemarks || []; // Assuming you have previous remarks stored
 
+    // Simulated conversation data for demonstration purposes
+    const conversationData = [];
+
+    if (currentRemark) {
+      conversationData.push({
+        message: currentRemark,
+        date: new Date().toISOString(), // Current date for the current remark
+      });
+    } else {
+      conversationData.push({
+        message: 'No current remark found',
+        date: new Date().toISOString(),
+      });
+    }
+
+    // Add previous remarks to conversation data
+    previousRemarks.forEach((remark, index) => {
+      conversationData.push({
+        message: `Previous Remark ${index + 1}: ${remark}`, // Modify the format as needed
+        date: '2023-12-23T09:30:00Z', // Use the appropriate date for previous remarks
+      });
+    });
+
+    return conversationData;
+  };
+  const handleViewStudentConversation = (record) => {
+    const conversationData = getConversationHistory(record);
+    setStudentConversation(conversationData);
+    setPreviewVisible2(true); // Open the second modal
+  };
+  const handleModal1Cancel = () => {
+    setPreviewVisible2(false);
+    setStudentConversation([]); // Reset conversation state for modal 1
+  };
   const entity = 'lead';
   const searchConfig = {
     displayLabels: ['full_name', 'company', 'contact.email'],
@@ -173,8 +211,15 @@ export default function Lead() {
       dataIndex: 'customfields.paid_amount',
     },
     {
+      // Other columns...
       title: translate('Due amount'),
-      dataIndex: 'customfields.due_amount',
+      dataIndex: 'customfields',
+      render: (customfields) => {
+        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
+        const paidAmount = parseFloat(customfields.paid_amount) || 0;
+        const dueAmount = totalPaidAmount - paidAmount;
+        return <span>{dueAmount.toFixed(2)}</span>; // Modify the display format as needed
+      },
     },
     {
       title: translate('Total Paid amount'),
@@ -296,19 +341,25 @@ export default function Lead() {
       key: 'total_course_fee'
     },
     {
+      title: translate('Total Paid amount'),
+      dataIndex: ['customfields', 'total_paid_amount'],
+      key: 'total_paid_amount'
+    },
+    {
       title: translate('paid amount'),
       dataIndex: ['customfields', 'paid_amount'],
       key: 'paid_amount'
     },
     {
+      // Other columns...
       title: translate('Due amount'),
-      dataIndex: ['customfields', 'due_amount'],
-      key: 'due_amount'
-    },
-    {
-      title: translate('Total Paid amount'),
-      dataIndex: ['customfields', 'total_paid_amount'],
-      key: 'total_paid_amount'
+      dataIndex: 'customfields',
+      render: (customfields) => {
+        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
+        const paidAmount = parseFloat(customfields.paid_amount) || 0;
+        const dueAmount = totalPaidAmount - paidAmount;
+        return <span>{dueAmount}</span>; // Modify the display format as needed
+      },
     },
     {
       title: translate('Fee receipt screenshot'),
@@ -344,7 +395,18 @@ export default function Lead() {
       dataIndex: ['customfields', 'send_fee_receipt'],
       key: 'send_fee_receipt',
     },
-
+    {
+      title: 'Remark',
+      dataIndex: ['customfields', 'remark'],
+      key: 'remark',
+      render: (remark, record) => (
+        <div>
+          <Button onClick={() => handleViewStudentConversation(record)}>
+            Remark
+          </Button>
+        </div>
+      ),
+    },
     {
       title: translate('Status'),
       dataIndex: ['customfields', 'status'],
@@ -393,8 +455,8 @@ export default function Lead() {
     <>
 
       <Modal
-        visible={previewVisible}
-        onCancel={() => setPreviewVisible(false)}
+        visible={previewVisible1}
+        onCancel={() => setPreviewVisible1(false)}
         footer={null}
         width={800}
         centered
@@ -471,7 +533,22 @@ export default function Lead() {
         </div>
 
       </Modal>
-
+      <Modal
+        visible={previewVisible2}
+        onCancel={handleModal1Cancel}
+        footer={null}
+        width={800}
+        centered
+      >
+        {/* Content for the first modal */}
+        <div>
+          {studentConversation.map((conversation, index) => (
+            <p key={index}>
+              {conversation.message} - {new Date(conversation.date).toLocaleDateString()}
+            </p>
+          ))}
+        </div>
+      </Modal>
       <CrudModule
         createForm={<LeadForm />}
         updateForm={<EditForm isUpdateForm={true} />}

@@ -107,7 +107,7 @@ export default function DataTable({ config, extra = [] }) {
   dataTableColumns = [
     ...dataTableColumns,
     {
-      title: '',
+      title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Dropdown

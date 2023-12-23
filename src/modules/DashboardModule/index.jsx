@@ -1,8 +1,6 @@
 import { Tag, Row, Col } from 'antd';
 import useLanguage from '@/locale/useLanguage';
-
 import { useMoney } from '@/settings';
-
 import { request } from '@/request';
 import useFetch from '@/hooks/useFetch';
 
@@ -47,7 +45,7 @@ export default function DashboardModule() {
 
     {
       title: translate('Total'),
-      dataIndex: 'total',
+      dataIndex: 'total_course_fee',
       onCell: () => {
         return {
           style: {
@@ -56,7 +54,7 @@ export default function DashboardModule() {
           },
         };
       },
-      render: (total) => moneyFormatter({ amount: total }),
+      render: (total_course_fee) => moneyFormatter({ amount: total_course_fee }),
     },
     {
       title: translate('Status'),
@@ -137,20 +135,50 @@ export default function DashboardModule() {
       />
     );
   });
+  const invoiceCard = (
+    <SummaryCard
+      title={translate('Invoice')}
+      tagColor={'purple'} // Adjust tag color if desired
+      prefix={translate('Total Amount')}
+      isLoading={paymentLoading}
+      tagContent={`${moneyFormatter({ amount: paymentResult?.total_paid_amount })}`}
+    />
+  );
+  const totalPaidAmountCard = (
+    <SummaryCard
+      title={translate('Total Paid Amount')}
+      tagColor={'blue'} // Adjust tag color if desired
+      prefix={translate('Total Amount')}
+      isLoading={paymentLoading}
+      tagContent={`${moneyFormatter({ amount: paymentResult?.total_paid_amount })}`}
+    />
+  );
 
+  const paidAmountCard = (
+    <SummaryCard
+      title={translate('Paid Amount')}
+      tagColor={'green'} // Adjust tag color if desired
+      prefix={translate('Paid Amount')}
+      isLoading={paymentLoading}
+      tagContent={`${moneyFormatter({ amount: paymentResult?.paid_amount })}`}
+    />
+  );
+  const dueAmountCard = (
+    <SummaryCard
+      title={translate('Due Amount')}
+      tagColor={'red'} // Adjust tag color if desired
+      prefix={translate('Due amount')}
+      isLoading={paymentLoading}
+      tagContent={`${moneyFormatter({ amount: paymentResult?.due_amount })}`}
+    />
+  );
   return (
     <>
       <Row gutter={[32, 32]}>
-        {cards}
-        <SummaryCard
-          title={translate('Due Balance')}
-          tagColor={'red'}
-          prefix={translate('Not Paid')}
-          isLoading={invoiceLoading}
-          tagContent={
-            invoiceResult?.total_undue && moneyFormatter({ amount: invoiceResult?.total_undue })
-          }
-        />
+        {invoiceCard}
+        {totalPaidAmountCard}
+        {paidAmountCard}
+        {dueAmountCard}
       </Row>
       <div className="space30"></div>
       <Row gutter={[32, 32]}>

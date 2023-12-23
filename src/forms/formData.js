@@ -203,6 +203,14 @@ const formData = [
             type: 'select',
             options: ['New', 'Cancel', 'Alumini', 'Deactive'],
           },
+          {
+            key: 'text',
+            label: 'Remarks',
+            name: 'customfields.remark',
+            place: 'Enter Remark',
+            id: 'remark',
+            type: 'textarea',
+          },
         ],
       },
       {

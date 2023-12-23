@@ -17,12 +17,12 @@ export default function Payment() {
       dataIndex: 'number',
     },
     {
-      title: translate('Client'),
-      dataIndex: ['client', 'company'],
+      title: translate('Total paid amount'),
+      dataIndex: 'total_paid_amount',
     },
     {
-      title: translate('Amount'),
-      dataIndex: 'amount',
+      title: translate('paid amount'),
+      dataIndex: 'paid_amount',
     },
     {
       title: translate('Date'),
@@ -30,10 +30,6 @@ export default function Payment() {
       render: (date) => {
         return dayjs(date).format('DD/MM/YYYY');
       },
-    },
-    {
-      title: translate('Number'),
-      dataIndex: ['invoice', 'number'],
     },
     {
       title: translate('year'),

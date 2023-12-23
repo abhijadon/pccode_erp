@@ -245,17 +245,6 @@ export default function LeadForm() {
                 <Input />
             </Form.Item>
             <Form.Item
-                label={translate('Due Amount')}
-                name={['customfields', 'due_amount']}
-                rules={[
-                    {
-                        required: true,
-                    },
-                ]}
-            >
-                <Input />
-            </Form.Item>
-            <Form.Item
                 label={translate('Total Paid Amount')}
                 name={['customfields', 'total_paid_amount']}
                 rules={[
@@ -315,6 +304,17 @@ export default function LeadForm() {
                         { value: 'not interested', label: translate('not interested') },
                     ]}
                 ></Select>
+            </Form.Item>
+            <Form.Item
+                label={translate('Remark')}
+                name={['customfields', 'remark']}
+                rules={[
+                    {
+                        required: true,
+                    },
+                ]}
+            >
+                <Input />
             </Form.Item>
         </>
     );
