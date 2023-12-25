@@ -1,4 +1,4 @@
-import { Tag, Row, Col } from 'antd';
+import { Tag, Row, Col, Select, message, Button } from 'antd';
 import useLanguage from '@/locale/useLanguage';
 import { useMoney } from '@/settings';
 import { request } from '@/request';
@@ -7,10 +7,49 @@ import RecentTable from './components/RecentTable';
 import SummaryCard from './components/SummaryCard';
 import PreviewCard from './components/PreviewCard';
 import CustomerPreviewCard from './components/CustomerPreviewCard';
-
+import { useState, useEffect } from 'react';
 export default function DashboardModule() {
   const translate = useLanguage();
   const { moneyFormatter } = useMoney();
+  const [selectedInstitute, setSelectedInstitute] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [filteredPaymentData, setFilteredPaymentData] = useState({});
+  const [universityExistenceMessage, setUniversityExistenceMessage] = useState('');
+
+  const handleInstituteChange = (value) => {
+    setSelectedInstitute(value);
+  };
+
+  const handleUniversityChange = (value) => {
+    setSelectedUniversity(value);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedInstitute || selectedUniversity) {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
+          );
+          const data = await response.json();
+
+          if (data.success && data.result !== null) {
+            // University exists, update filtered payment data state
+            setFilteredPaymentData(data.result || {});
+          } else {
+            // University doesn't exist, set payment data to 0 and show notification
+            setFilteredPaymentData({});
+            message.error(
+              `The specified university (${selectedUniversity}) does not exist in the dataset.`
+            );
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+    };
+    fetchData();
+  }, [selectedInstitute, selectedUniversity]);
   const { result: invoiceResult, isLoading: invoiceLoading } = useFetch(() =>
     request.summary({ entity: 'invoice' })
   );
@@ -136,42 +175,83 @@ export default function DashboardModule() {
   const invoiceCard = (
     <SummaryCard
       title={translate('Invoice')}
-      tagColor={'purple'} // Adjust tag color if desired
+      tagColor={'purple'}
       prefix={translate('Total Amount')}
       isLoading={paymentLoading}
-      tagContent={`${moneyFormatter({ amount: paymentResult?.total_paid_amount })}`}
+      tagContent={`${moneyFormatter({ amount: filteredPaymentData.total_paid_amount || paymentResult?.total_paid_amount })}`}
     />
   );
+
   const totalPaidAmountCard = (
     <SummaryCard
       title={translate('Total Paid Amount')}
-      tagColor={'blue'} // Adjust tag color if desired
+      tagColor={'blue'}
       prefix={translate('Total Amount')}
       isLoading={paymentLoading}
-      tagContent={`${moneyFormatter({ amount: paymentResult?.total_paid_amount })}`}
+      tagContent={`${moneyFormatter({ amount: filteredPaymentData.total_paid_amount || paymentResult?.total_paid_amount })}`}
     />
   );
 
   const paidAmountCard = (
     <SummaryCard
       title={translate('Paid Amount')}
-      tagColor={'green'} // Adjust tag color if desired
+      tagColor={'green'}
       prefix={translate('Paid Amount')}
       isLoading={paymentLoading}
-      tagContent={`${moneyFormatter({ amount: paymentResult?.paid_amount })}`}
+      tagContent={`${moneyFormatter({ amount: filteredPaymentData.paid_amount || paymentResult?.paid_amount })}`}
     />
   );
+
   const dueAmountCard = (
     <SummaryCard
       title={translate('Due Amount')}
-      tagColor={'red'} // Adjust tag color if desired
+      tagColor={'red'}
       prefix={translate('Due amount')}
       isLoading={paymentLoading}
-      tagContent={`${moneyFormatter({ amount: paymentResult?.due_amount })}`}
+      tagContent={`${moneyFormatter({ amount: filteredPaymentData.due_amount || paymentResult?.due_amount })}`}
     />
   );
+  const resetData = () => {
+    setSelectedInstitute('');
+    setSelectedUniversity('');
+    setFilteredPaymentData({});
+    setUniversityExistenceMessage(''); // Reset university existence message if needed
+  };
   return (
     <>
+      {/* Display the university existence message */}
+      {universityExistenceMessage && (
+        <Row gutter={[32, 32]}>
+          <Col span={24}>
+            <div style={{ color: 'red' }}>{universityExistenceMessage}</div>
+          </Col>
+        </Row>
+      )}
+      <Row className='flex space-x-7'>
+        {/* Select for Institute */}
+
+
+        <Select value={selectedInstitute} onChange={handleInstituteChange} className='w-36'>
+          {/* Options for Institute */}
+
+          <Select.Option value="HES">HES</Select.Option>
+          <Select.Option value="DES">DES</Select.Option>
+          {/* Add more options as needed */}
+        </Select>
+
+
+        {/* Select for University */}
+
+        <Select value={selectedUniversity} onChange={handleUniversityChange} className='w-36'>
+          {/* Options for University */}
+          <Select.Option value="SPU">SPU</Select.Option>
+          <Select.Option value="CU">CU</Select.Option>
+          {/* Add more options as needed */}
+        </Select>
+        <Button onClick={resetData}>Reset All</Button>
+
+      </Row>
+
       <Row gutter={[32, 32]}>
         {invoiceCard}
         {totalPaidAmountCard}
