@@ -29,13 +29,15 @@ export default function DashboardModule() {
       if (selectedInstitute || selectedUniversity) {
         try {
           const response = await fetch(
-            `${import.meta.env.VITE_BACKEND_SERVER}/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
+            `https://sode-erp.onrender.com/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
           );
           const data = await response.json();
 
           if (data.success && data.result !== null) {
+            // University exists, update filtered payment data state
             setFilteredPaymentData(data.result || {});
           } else {
+            // University doesn't exist, set payment data to 0 and show notification
             setFilteredPaymentData({});
             message.error(
               `The specified university (${selectedUniversity}) does not exist in the dataset.`
