@@ -29,15 +29,13 @@ export default function DashboardModule() {
       if (selectedInstitute || selectedUniversity) {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
+            `${import.meta.env.VITE_BACKEND_SERVER}/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
           );
           const data = await response.json();
 
           if (data.success && data.result !== null) {
-            // University exists, update filtered payment data state
             setFilteredPaymentData(data.result || {});
           } else {
-            // University doesn't exist, set payment data to 0 and show notification
             setFilteredPaymentData({});
             message.error(
               `The specified university (${selectedUniversity}) does not exist in the dataset.`
@@ -109,18 +107,18 @@ export default function DashboardModule() {
       result: invoiceResult,
       isLoading: invoiceLoading,
       entity: 'invoice',
-      title: translate('Invoices preview'),
+      title: translate('Institute preview'),
     },
     {
       result: quoteResult,
       isLoading: quoteLoading,
       entity: 'quote',
-      title: translate('quotes preview'),
+      title: translate('Student preview'),
     },
     {
       result: offerResult,
       isLoading: offerLoading,
-      entity: 'offer',
+      entity: 'payment',
       title: translate('offers preview'),
     },
     {
