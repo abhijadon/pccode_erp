@@ -115,7 +115,7 @@ export default function DashboardModule() {
       result: quoteResult,
       isLoading: quoteLoading,
       entity: 'quote',
-      title: translate('Student preview'),
+      title: translate('University preview'),
     },
     {
       result: offerResult,
