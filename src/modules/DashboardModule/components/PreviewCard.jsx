@@ -2,36 +2,27 @@ import { useMemo, useState, useEffect } from 'react';
 import { Col, Progress } from 'antd';
 import useLanguage from '@/locale/useLanguage';
 
-// Fetch data from the API endpoint
 const fetchData = async () => {
   try {
-    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
+    const response = await fetch('http://localhost:5000/api/payment/summary');
     const data = await response.json();
-    return data; // Assuming the response structure matches the provided JSON
+
+    if (data?.instituteSpecificData && data?.universitySpecificData) {
+      // Combine institute and university specific data into a single array
+      return [...data.instituteSpecificData, ...data.universitySpecificData];
+    } else if (data?.instituteSpecificData) {
+      return data.instituteSpecificData;
+    } else if (data?.universitySpecificData) {
+      return data.universitySpecificData;
+    } else {
+      console.error('No specific data found in the response');
+      return [];
+    }
   } catch (error) {
     console.error('Error fetching data:', error);
-    return null;
+    return [];
   }
 };
-
-const fetchDataa = async () => {
-  try {
-    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary?institute_name=DES');
-    const data = await response.json()
-    return data;
-  } catch (error) {
-    console.error('Error fetching data', error)
-  }
-}
-const fetchDataaa = async () => {
-  try {
-    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary?institute_name=HES');
-    const data = await response.json()
-    return data;
-  } catch (error) {
-    console.error('Error fetching data', error)
-  }
-}
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -53,7 +44,7 @@ const defaultStatistics = [
     value: 0,
   },
   {
-    tag: 'LPU',
+    tag: 'CU',
     value: 0,
   },
   {
@@ -131,6 +122,7 @@ export default function PreviewCard({
   statistics = defaultStatistics,
   isLoading = false,
   entity = 'invoice',
+
 }) {
   const statisticsMap = useMemo(() => {
     let defaultStats = [];
@@ -149,15 +141,24 @@ export default function PreviewCard({
   }, [statistics, entity]);
 
 
-  const [totalCount, setTotalCount] = useState(null);
-  const [instituteCounts, setInstituteCounts] = useState(null);
-  const [instituteCount, setInstituteCount] = useState(null);
+  const [universityCounts, setUniversityCounts] = useState([]);
+  const [instituteCounts, setInstituteCounts] = useState([]);
+
   useEffect(() => {
     const getData = async () => {
       const data = await fetchData();
       if (data) {
-        setTotalCount(data.result.count);
-        // setInstituteCounts(data.instituteData.map((institute) => institute.value));
+        const counts = {};
+
+        // Prepare university-wise counts
+        data.forEach((universityData) => {
+          const { _id, count } = universityData[0] || {};
+          if (_id && count) {
+            counts[_id] = count;
+          }
+        });
+
+        setUniversityCounts(counts);
       }
     };
 
@@ -166,26 +167,40 @@ export default function PreviewCard({
 
   useEffect(() => {
     const getData = async () => {
-      const data = await fetchDataa();
+      const data = await fetchData();
       if (data) {
-        setInstituteCounts(data.result.count);
+        const counts = {};
+
+        // Prepare university-wise counts
+        data.forEach((instituteData) => {
+          const { _id, count } = instituteData[0] || {};
+          if (_id && count) {
+            counts[_id] = count;
+          }
+        });
+
+        setInstituteCounts(counts);
       }
     };
 
     getData();
   }, []);
 
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchDataaa();
-      if (data) {
-        setInstituteCount(data.result.count);
-      }
-    };
+  const universityTagCounts = useMemo(() => {
+    const counts = {};
+    Object.keys(universityCounts).forEach((tag) => {
+      counts[tag] = universityCounts[tag] !== undefined ? universityCounts[tag] : 0;
+    });
+    return counts;
+  }, [universityCounts]);
 
-    getData();
-  }, []);
-
+  const instituteTagCounts = useMemo(() => {
+    const counts = {};
+    Object.keys(instituteCounts).forEach((tag) => {
+      counts[tag] = instituteCounts[tag] !== undefined ? instituteCounts[tag] : 0;
+    });
+    return counts;
+  }, [instituteCounts]);
   const customSort = (a, b) => {
     const colorOrder = Object.values(colours);
     const indexA = colorOrder.indexOf(colours[a.tag]);
@@ -212,43 +227,24 @@ export default function PreviewCard({
         >
           {title}
         </h3>
-
         {!isLoading &&
           statisticsMap
             ?.map((status, index) => {
-              if (status.tag === 'Total') {
+              // Check if the status tag corresponds to a university count
+              const universityCount = universityTagCounts[status.tag];
+              if (universityCount !== undefined) {
                 return (
                   <PreviewState
                     key={index}
                     tag={status.tag}
                     color={colours[status.tag]}
                     value={status.value}
-                    displayedValue={totalCount || 'Loading...'}
+                    displayedValue={universityCount.toString()} // Show the university count
                   />
                 );
               }
-              if (status.tag === 'DES') {
-                return (
-                  <PreviewState
-                    key={index}
-                    tag={status.tag}
-                    color={colours[status.tag]}
-                    value={status.value}
-                    displayedValue={instituteCounts || 'Loading...'}
-                  />
-                );
-              }
-              if (status.tag === 'HES') {
-                return (
-                  <PreviewState
-                    key={index}
-                    tag={status.tag}
-                    color={colours[status.tag]}
-                    value={status.value}
-                    displayedValue={instituteCount || 'Loading...'}
-                  />
-                );
-              }
+
+              // For other status tags, render as before
               return (
                 <PreviewState
                   key={index}
