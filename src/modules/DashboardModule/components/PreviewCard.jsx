@@ -4,7 +4,7 @@ import useLanguage from '@/locale/useLanguage';
 
 const fetchData = async () => {
   try {
-    const response = await fetch('http://localhost:5000/api/payment/summary');
+    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
     const data = await response.json();
 
     if (data?.instituteSpecificData && data?.universitySpecificData) {
