@@ -1,7 +1,37 @@
-import { useMemo } from 'react';
-import { Col, Progress, Spin } from 'antd';
+import { useMemo, useState, useEffect } from 'react';
+import { Col, Progress } from 'antd';
 import useLanguage from '@/locale/useLanguage';
 
+// Fetch data from the API endpoint
+const fetchData = async () => {
+  try {
+    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
+    const data = await response.json();
+    return data; // Assuming the response structure matches the provided JSON
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return null;
+  }
+};
+
+const fetchDataa = async () => {
+  try {
+    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary?institute_name=DES');
+    const data = await response.json()
+    return data;
+  } catch (error) {
+    console.error('Error fetching data', error)
+  }
+}
+const fetchDataaa = async () => {
+  try {
+    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary?institute_name=HES');
+    const data = await response.json()
+    return data;
+  } catch (error) {
+    console.error('Error fetching data', error)
+  }
+}
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -118,6 +148,44 @@ export default function PreviewCard({
     });
   }, [statistics, entity]);
 
+
+  const [totalCount, setTotalCount] = useState(null);
+  const [instituteCounts, setInstituteCounts] = useState(null);
+  const [instituteCount, setInstituteCount] = useState(null);
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchData();
+      if (data) {
+        setTotalCount(data.result.count);
+        // setInstituteCounts(data.instituteData.map((institute) => institute.value));
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchDataa();
+      if (data) {
+        setInstituteCounts(data.result.count);
+      }
+    };
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchDataaa();
+      if (data) {
+        setInstituteCount(data.result.count);
+      }
+    };
+
+    getData();
+  }, []);
+
   const customSort = (a, b) => {
     const colorOrder = Object.values(colours);
     const indexA = colorOrder.indexOf(colours[a.tag]);
@@ -144,23 +212,53 @@ export default function PreviewCard({
         >
           {title}
         </h3>
-        {isLoading ? (
-          <div style={{ textAlign: 'center' }}>
-            <Spin />
-          </div>
-        ) : (
+
+        {!isLoading &&
           statisticsMap
-            ?.map((status, index) => (
-              <PreviewState
-                key={index}
-                tag={status.tag}
-                color={colours[status.tag]}
-                value={status.value}
-                displayedValue='40'
-              />
-            ))
-            .sort(customSort)
-        )}
+            ?.map((status, index) => {
+              if (status.tag === 'Total') {
+                return (
+                  <PreviewState
+                    key={index}
+                    tag={status.tag}
+                    color={colours[status.tag]}
+                    value={status.value}
+                    displayedValue={totalCount || 'Loading...'}
+                  />
+                );
+              }
+              if (status.tag === 'DES') {
+                return (
+                  <PreviewState
+                    key={index}
+                    tag={status.tag}
+                    color={colours[status.tag]}
+                    value={status.value}
+                    displayedValue={instituteCounts || 'Loading...'}
+                  />
+                );
+              }
+              if (status.tag === 'HES') {
+                return (
+                  <PreviewState
+                    key={index}
+                    tag={status.tag}
+                    color={colours[status.tag]}
+                    value={status.value}
+                    displayedValue={instituteCount || 'Loading...'}
+                  />
+                );
+              }
+              return (
+                <PreviewState
+                  key={index}
+                  tag={status.tag}
+                  color={colours[status.tag]}
+                  value={status.value}
+                />
+              );
+            })
+            .sort(customSort)}
       </div>
     </Col>
   );
