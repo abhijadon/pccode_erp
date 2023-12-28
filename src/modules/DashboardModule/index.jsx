@@ -11,8 +11,14 @@ import { useState, useEffect } from 'react';
 export default function DashboardModule() {
   const translate = useLanguage();
   const { moneyFormatter } = useMoney();
+
+  const [institutes, setInstitutes] = useState([]);
+  const [universities, setUniversities] = useState([]);
+  const [counselors, setCounselors] = useState([]);
+
   const [selectedInstitute, setSelectedInstitute] = useState('');
   const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [selectedCounselor, setSelectedCounselor] = useState('');
   const [filteredPaymentData, setFilteredPaymentData] = useState({});
   const [universityExistenceMessage, setUniversityExistenceMessage] = useState('');
 
@@ -24,20 +30,53 @@ export default function DashboardModule() {
     setSelectedUniversity(value);
   };
 
+  const handleCounselorChange = (value) => {
+    setSelectedCounselor(value);
+  };
+
+  const resetData = () => {
+    setSelectedInstitute('');
+    setSelectedUniversity('');
+    setSelectedCounselor('');
+    setFilteredPaymentData({});
+    setUniversityExistenceMessage('');
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch('https://sode-erp.onrender.com/api/payment/list');
+      const data = await response.json();
+
+      if (data.success && data.result !== null) {
+        const uniqueInstitutes = [...new Set(data.result.map((item) => item.institute_name))];
+        const uniqueUniversities = [...new Set(data.result.map((item) => item.university_name))];
+        const uniqueCounselors = [...new Set(data.result.map((item) => item.counselor_email))];
+
+        setInstitutes(uniqueInstitutes);
+        setUniversities(uniqueUniversities);
+        setCounselors(uniqueCounselors);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedInstitute || selectedUniversity) {
+      if (selectedInstitute || selectedUniversity || selectedCounselor) {
         try {
           const response = await fetch(
-            `https://sode-erp.onrender.com/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}`
+            `https://sode-erp.onrender.com/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}&counselor_email=${selectedCounselor}`
           );
           const data = await response.json();
 
           if (data.success && data.result !== null) {
-            // University exists, update filtered payment data state
             setFilteredPaymentData(data.result || {});
           } else {
-            // University doesn't exist, set payment data to 0 and show notification
             setFilteredPaymentData({});
             message.error(
               `The specified university (${selectedUniversity}) does not exist in the dataset.`
@@ -49,7 +88,7 @@ export default function DashboardModule() {
       }
     };
     fetchData();
-  }, [selectedInstitute, selectedUniversity]);
+  }, [selectedInstitute, selectedUniversity, selectedCounselor]);
   const { result: invoiceResult, isLoading: invoiceLoading } = useFetch(() =>
     request.summary({ entity: 'invoice' })
   );
@@ -211,15 +250,9 @@ export default function DashboardModule() {
       tagContent={`${moneyFormatter({ amount: filteredPaymentData.due_amount || paymentResult?.due_amount })}`}
     />
   );
-  const resetData = () => {
-    setSelectedInstitute('');
-    setSelectedUniversity('');
-    setFilteredPaymentData({});
-    setUniversityExistenceMessage(''); // Reset university existence message if needed
-  };
+
   return (
     <>
-      {/* Display the university existence message */}
       {universityExistenceMessage && (
         <Row gutter={[32, 32]}>
           <Col span={24}>
@@ -228,28 +261,34 @@ export default function DashboardModule() {
         </Row>
       )}
       <Row className='flex space-x-7'>
-        {/* Select for Institute */}
-
-
         <Select value={selectedInstitute} onChange={handleInstituteChange} className='w-36'>
-          {/* Options for Institute */}
-
-          <Select.Option value="HES">HES</Select.Option>
-          <Select.Option value="DES">DES</Select.Option>
-          {/* Add more options as needed */}
+          <Select.Option value=''>Select Institute</Select.Option>
+          {institutes.map((option) => (
+            <Select.Option key={option} value={option}>
+              {option}
+            </Select.Option>
+          ))}
         </Select>
-
-
-        {/* Select for University */}
 
         <Select value={selectedUniversity} onChange={handleUniversityChange} className='w-36'>
-          {/* Options for University */}
-          <Select.Option value="SPU">SPU</Select.Option>
-          <Select.Option value="CU">CU</Select.Option>
-          {/* Add more options as needed */}
+          <Select.Option value=''>Select University</Select.Option>
+          {universities.map((option) => (
+            <Select.Option key={option} value={option}>
+              {option}
+            </Select.Option>
+          ))}
         </Select>
-        <Button onClick={resetData}>Reset All</Button>
 
+        <Select value={selectedCounselor} onChange={handleCounselorChange} className='w-36'>
+          <Select.Option value=''>Select Counselor</Select.Option>
+          {counselors.map((option) => (
+            <Select.Option key={option} value={option}>
+              {option}
+            </Select.Option>
+          ))}
+        </Select>
+
+        <Button onClick={resetData}>Reset All</Button>
       </Row>
 
       <Row gutter={[32, 32]}>

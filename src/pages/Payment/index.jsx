@@ -17,6 +17,18 @@ export default function Payment() {
       dataIndex: 'lead_id',
     },
     {
+      title: translate('student name'),
+      dataIndex: 'student_name',
+    },
+    {
+      title: translate('email'),
+      dataIndex: 'email',
+    },
+    {
+      title: translate('phone number'),
+      dataIndex: 'phone',
+    },
+    {
       title: translate('Total paid amount'),
       dataIndex: 'total_paid_amount',
     },

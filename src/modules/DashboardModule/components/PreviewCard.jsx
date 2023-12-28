@@ -1,28 +1,28 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Col, Progress } from 'antd';
+import { Col, Progress, Dropdown, Menu, Button, Space } from 'antd';
+import { FilterOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
+// const fetchData = async () => {
+//   try {
+//     const response = await fetch('http://localhost:5000/api/payment/summary');
+//     const data = await response.json();
 
-const fetchData = async () => {
-  try {
-    const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
-    const data = await response.json();
-
-    if (data?.instituteSpecificData && data?.universitySpecificData) {
-      // Combine institute and university specific data into a single array
-      return [...data.instituteSpecificData, ...data.universitySpecificData];
-    } else if (data?.instituteSpecificData) {
-      return data.instituteSpecificData;
-    } else if (data?.universitySpecificData) {
-      return data.universitySpecificData;
-    } else {
-      console.error('No specific data found in the response');
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return [];
-  }
-};
+//     if (data?.instituteSpecificData && data?.universitySpecificData) {
+//       // Combine institute and university specific data into a single array
+//       return [...data.instituteSpecificData, ...data.universitySpecificData];
+//     } else if (data?.instituteSpecificData) {
+//       return data.instituteSpecificData;
+//     } else if (data?.universitySpecificData) {
+//       return data.universitySpecificData;
+//     } else {
+//       console.error('No specific data found in the response');
+//       return [];
+//     }
+//   } catch (error) {
+//     console.error('Error fetching data:', error);
+//     return [];
+//   }
+// };
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -122,8 +122,31 @@ export default function PreviewCard({
   statistics = defaultStatistics,
   isLoading = false,
   entity = 'invoice',
+  type,
 
 }) {
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/payment/summary?type=${type}`);
+      const data = await response.json();
+
+      if (data?.instituteSpecificData && data?.universitySpecificData) {
+        // Combine institute and university specific data into a single array
+        return [...data.instituteSpecificData, ...data.universitySpecificData];
+      } else if (data?.instituteSpecificData) {
+        return data.instituteSpecificData;
+      } else if (data?.universitySpecificData) {
+        return data.universitySpecificData;
+      } else {
+        console.error('No specific data found in the response');
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return [];
+    }
+  };
   const statisticsMap = useMemo(() => {
     let defaultStats = [];
     if (entity === 'invoice') {
@@ -140,16 +163,26 @@ export default function PreviewCard({
     });
   }, [statistics, entity]);
 
-
   const [universityCounts, setUniversityCounts] = useState([]);
   const [instituteCounts, setInstituteCounts] = useState([]);
+  const [filterType, setFilterType] = useState('month'); // State to manage filter type
 
+  const handleFilterChange = ({ key }) => {
+    setFilterType(key);
+  };
+
+  const filterMenu = (
+    <Menu onClick={handleFilterChange}>
+      <Menu.Item key="week">Week</Menu.Item>
+      <Menu.Item key="month">Month</Menu.Item>
+      <Menu.Item key="year">Year</Menu.Item>
+    </Menu>
+  );
   useEffect(() => {
     const getData = async () => {
       const data = await fetchData();
       if (data) {
         const counts = {};
-
         // Prepare university-wise counts
         data.forEach((universityData) => {
           const { _id, count } = universityData[0] || {};
@@ -157,13 +190,30 @@ export default function PreviewCard({
             counts[_id] = count;
           }
         });
-
         setUniversityCounts(counts);
       }
     };
-
     getData();
-  }, []);
+  }, [type]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await fetchData();
+      if (data) {
+        const counts = {};
+        // Prepare institute-wise counts
+        data.forEach((instituteData) => {
+          const { _id, count } = instituteData[0] || {};
+          if (_id && count) {
+            counts[_id] = count;
+          }
+        });
+        setInstituteCounts(counts);
+      }
+    };
+    getData();
+  }, [type]);
+
 
   useEffect(() => {
     const getData = async () => {
@@ -185,6 +235,7 @@ export default function PreviewCard({
 
     getData();
   }, []);
+
 
   const universityTagCounts = useMemo(() => {
     const counts = {};
@@ -215,8 +266,15 @@ export default function PreviewCard({
       sm={{ span: 24 }}
       md={{ span: 8 }}
       lg={{ span: 8 }}
-    >
+    > <Space>
+        <Dropdown overlay={filterMenu} trigger={['click']}>
+          <button className='bg-transparent'>
+            <FilterOutlined className='text-black' /> {filterType}
+          </button>
+        </Dropdown>
+      </Space>
       <div className="pad20">
+
         <h3
           style={{
             color: '#22075e',
@@ -225,7 +283,9 @@ export default function PreviewCard({
             marginTop: 0,
           }}
         >
+
           {title}
+
         </h3>
         {!isLoading &&
           statisticsMap
