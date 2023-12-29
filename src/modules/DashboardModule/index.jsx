@@ -213,11 +213,11 @@ export default function DashboardModule() {
   });
   const invoiceCard = (
     <SummaryCard
-      title={translate('Invoice')}
+      title={translate('Total Course Fee')}
       tagColor={'purple'}
       prefix={translate('Total Amount')}
       isLoading={paymentLoading}
-      tagContent={`${moneyFormatter({ amount: filteredPaymentData.total_paid_amount || paymentResult?.total_paid_amount })}`}
+      tagContent={`${moneyFormatter({ amount: filteredPaymentData.total_course_fee || paymentResult?.total_course_fee })}`}
     />
   );
 
@@ -233,7 +233,7 @@ export default function DashboardModule() {
 
   const paidAmountCard = (
     <SummaryCard
-      title={translate('Paid Amount')}
+      title={translate('Recent Paid')}
       tagColor={'green'}
       prefix={translate('Paid Amount')}
       isLoading={paymentLoading}

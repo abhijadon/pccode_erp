@@ -2,13 +2,14 @@ import {
   DownloadOutlined, LeftOutlined, RightOutlined
   , PrinterOutlined
 } from '@ant-design/icons';
-import { Tag, Modal, Image, Button } from 'antd';
-import dayjs from 'dayjs'; // Import dayjs if not already imported
+import { Tag, Modal, Image, Button, Select } from 'antd';
+
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
 import EditForm from '../../forms/EdtiForm';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 export default function Lead() {
   const translate = useLanguage();
   const [previewVisible1, setPreviewVisible1] = useState(false);
@@ -16,6 +17,8 @@ export default function Lead() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [previewVisible2, setPreviewVisible2] = useState(false); // Second Modal
   const [studentConversation, setStudentConversation] = useState([]);
+
+
   const handleImagePreview = (imageData, index) => {
     setPreviewImages(imageData);
     setCurrentImageIndex(index);
@@ -59,6 +62,7 @@ export default function Lead() {
     });
 
     return conversationData;
+
   };
   const handleViewStudentConversation = (record) => {
     const conversationData = getConversationHistory(record);
@@ -73,15 +77,13 @@ export default function Lead() {
   const searchConfig = {
     displayLabels: ['full_name', 'company', 'contact.email'],
     searchFields: ['full_name', 'company', 'contact.email'],
-    outputValue: '_id',
+    outputValue: '\_id',
   };
-
-
 
   const handleDownload = (base64ImageData, imageName) => {
     try {
       // Check if the provided data is a valid Base64 string
-      const isBase64 = /^data:image\/([a-zA-Z]*);base64,([^\/\r\n]*)/.test(base64ImageData);
+      const isBase64 = /^data:image\/([a-zA-Z]_);base64,([^\/\r\n]_)/.test(base64ImageData);
 
       if (!isBase64) {
         console.error('Invalid Base64 data provided.');
@@ -114,17 +116,16 @@ export default function Lead() {
     } catch (error) {
       console.error('Error while handling download:', error);
     }
+
   };
   const handlePrint = (imageUrl) => {
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '\_blank');
     printWindow.document.write(
       `<img src="${imageUrl}" style="max-width:100%;" />`
     );
     printWindow.document.close();
     printWindow.print();
   };
-
-
 
   const entityDisplayLabels = ['number', 'company'];
 
@@ -233,6 +234,7 @@ export default function Lead() {
       title: translate('status'),
       dataIndex: 'status',
     },
+
   ];
 
   const dataTableColumns = [
@@ -342,8 +344,14 @@ export default function Lead() {
     },
     {
       title: translate('Total Paid amount'),
-      dataIndex: ['customfields', 'total_paid_amount'],
-      key: 'total_paid_amount'
+      dataIndex: 'customfields',
+      key: 'total_paid_amount',
+      render: (customfields) => {
+        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
+        const paidAmount = parseFloat(customfields.paid_amount) || 0;
+        const sum = totalPaidAmount + paidAmount;
+        return <span>{sum.toFixed(2)}</span>; // Adjust the display format as needed
+      },
     },
     {
       title: translate('paid amount'),
@@ -351,26 +359,32 @@ export default function Lead() {
       key: 'paid_amount'
     },
     {
-      // Other columns...
       title: translate('Due amount'),
       dataIndex: 'customfields',
       render: (customfields) => {
-        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
+        const totalCourseFee = parseFloat(customfields.total_course_fee) || 0;
         const paidAmount = parseFloat(customfields.paid_amount) || 0;
-        const dueAmount = totalPaidAmount - paidAmount;
-        return <span>{dueAmount}</span>; // Modify the display format as needed
+        const dueAmount = totalCourseFee - paidAmount;
+        return <span>{dueAmount.toFixed(2)}</span>; // Adjust the display format as needed
       },
     },
     {
       title: translate('Fee receipt screenshot'),
       dataIndex: ['customfields', 'upload_fee_receipt_screenshot'],
-      key: 'upload_fee_receipt_screenshot'
+      key: 'upload_fee_receipt_screenshot',
+      render: (screenshot) => (
+        screenshot && (
+          <a href={screenshot} target="_blank" rel="noopener noreferrer" download>
+            <DownloadOutlined style={{ fontSize: '20px', color: '#083662', cursor: 'pointer' }} />
+          </a>
+        )
+      ),
     },
     {
       title: translate('Student Document'),
       dataIndex: 'image',
       key: 'image',
-      render: (imageData, record, index) => {
+      render: (imageData) => {
         if (Array.isArray(imageData) && imageData.length > 0) {
           return (
             <div style={{ display: 'flex' }}>
@@ -425,11 +439,7 @@ export default function Lead() {
       },
 
     },
-    {
-      title: translate('Created'),
-      dataIndex: 'created',
-      render: (date) => dayjs(date).format('DD/MM/YYYY'),
-    },
+
   ];
 
   const Labels = {
@@ -453,7 +463,6 @@ export default function Lead() {
   };
   return (
     <>
-
       <Modal
         visible={previewVisible1}
         onCancel={() => setPreviewVisible1(false)}
@@ -553,8 +562,9 @@ export default function Lead() {
         createForm={<LeadForm />}
         updateForm={<EditForm isUpdateForm={true} />}
         config={config}
+
       />
     </>
+
   );
 }
-

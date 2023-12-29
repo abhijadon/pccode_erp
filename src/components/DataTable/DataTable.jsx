@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined, RedoOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button, Input, Select } from 'antd';
+import { useCallback, useEffect } from 'react';
+import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Dropdown, Table, Button } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -27,12 +27,6 @@ function AddNewItem({ config }) {
   );
 }
 export default function DataTable({ config, extra = [] }) {
-  // State variables for filtering
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedInstitute, setSelectedInstitute] = useState('');
-  const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [selectedSession, setSelectedSession] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -137,9 +131,12 @@ export default function DataTable({ config, extra = [] }) {
   const dispatch = useDispatch();
 
   const handelDataTableLoad = useCallback((pagination) => {
-    const options = { page: pagination.current || 1, items: pagination.pageSize || 10 };
+    const options = {
+      page: pagination.current || 1,
+      items: pagination.pageSize || 10
+    };
     dispatch(crud.list({ entity, options }));
-  }, []);
+  }, [dispatch, entity]);
 
   const dispatcher = () => {
     dispatch(crud.list({ entity }));
@@ -158,236 +155,14 @@ export default function DataTable({ config, extra = [] }) {
     items
   );
 
-  const universityOptions = [
-    { label: 'SPU', value: 'SPU' },
-    { label: 'CU', value: 'CU' },
-    { label: 'SGVU', value: 'SGVU' },
-    // Add more university options as needed
-  ];
-  const instituteOptions = [
-    { label: 'HES', value: 'HES' },
-    { label: 'DES', value: 'DES' },
-    // Add more institute options as needed
-  ];
 
-  const sessionOptions = [
-    { label: '2023', value: '2023' },
-    { label: '2024', value: '2024' },
-    // Add more institute options as needed
-  ];
 
-  const statusOptions = [
-    { label: 'New', value: 'New' },
-    { label: 'Cancel', value: 'Cancel' },
-    // Add more institute options as needed
-  ];
-  // Reset filters function
-  const handleResetFilters = () => {
-    setSelectedInstitute('');
-    setSelectedUniversity('');
-    setSearchValue('');
-    setSelectedSession('');
-    setSelectedStatus('');
-  };
-  // Reset filters function
-  const handleReset1 = () => {
-    setSelectedInstitute('');
-  };
-  // Reset filters function
-  const handleReset2 = () => {
-    setSelectedUniversity('');
-  };
 
-  // Reset filters function
-  const handleReset3 = () => {
-    setSelectedSession('');
-  };
-  // Reset filters function
-  const handleReset4 = () => {
-    setSelectedStatus('');
-  };
-  // Function to handle institute filter selection
-  const handleInstituteChange = (value) => {
-    setSelectedInstitute(value);
-  };
 
-  // Function to handle university filter selection
-  const handleUniversityChange = (value) => {
-    setSelectedUniversity(value);
-  };
-
-  // Function to handle university filter selection
-  const handleSessionChange = (value) => {
-    setSelectedSession(value);
-  };
-
-  // Function to handle university filter selection
-  const handleStatusChange = (value) => {
-    setSelectedStatus(value);
-  };
-
-  const applyFilters = (data) => {
-    let filteredData = [...data];
-
-    if (selectedInstitute !== '') {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.customfields &&
-          item.customfields.institute_name && // Correct the key to 'institue' instead of 'institute'
-          item.customfields.institute_name.toLowerCase() === selectedInstitute.toLowerCase()
-      );
-    }
-
-    if (selectedUniversity !== '') {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.customfields &&
-          item.customfields.university_name &&
-          item.customfields.university_name.toLowerCase() === selectedUniversity.toLowerCase()
-      );
-    }
-
-    if (selectedSession !== '') {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.customfields &&
-          item.customfields.session &&
-          item.customfields.session.toLowerCase() === selectedSession.toLowerCase()
-      );
-    }
-
-    if (selectedStatus !== '') {
-      filteredData = filteredData.filter(
-        (item) =>
-          item.customfields &&
-          item.customfields.status &&
-          item.customfields.status.toLowerCase() === selectedStatus.toLowerCase()
-      );
-    }
-    return filteredData;
-  };
-  // Rest of your code...
-
-  // Function to handle search value changes
-  const handleSearch = (e) => {
-    const { value } = e.target;
-    setSearchValue(value);
-  };
-
-  // Filtering data based on search value
-  const filteredBySearch = dataSource.filter((item) => {
-    // Modify searchFields as per your actual data structure
-    const searchFields = ['full_name', 'lead_id'];
-
-    const lowerCaseSearchValue = searchValue.toLowerCase();
-
-    return searchFields.some((field) => {
-      if (Array.isArray(field)) {
-        // Access nested fields in the data structure
-        const fieldValue = String(item[field[0]][field[1]]).toLowerCase();
-        return fieldValue.includes(lowerCaseSearchValue);
-      } else if (item[field]) {
-        const fieldValue = String(item[field]).toLowerCase();
-        return fieldValue.includes(lowerCaseSearchValue);
-      }
-      return false;
-    });
-  });
 
   return (
     <>
       <div className='-mt-6'>
-        {/* Filter condition using select for Institute */}
-        <div className='flex justify-between mb-24 items-center'>
-          <div className='grid grid-cols-3 gap-4'>
-            <div>
-
-              {/* Institute wise filter  */}
-              <h3>Filter by Institute</h3>
-              <Select
-                style={{ width: 170 }}
-                placeholder="Select Institute"
-                onChange={handleInstituteChange}
-                value={selectedInstitute}
-              >
-                {instituteOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </Select>
-              <p onClick={handleReset1} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
-            </div>
-
-            {/* University wise  */}
-            <div>
-              <h3>Filter by University</h3>
-              <Select
-                style={{ width: 170 }}
-                placeholder="Select University"
-                onChange={handleUniversityChange}
-                value={selectedUniversity}
-              >
-                {universityOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </Select>
-              <p onClick={handleReset2} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
-            </div>
-
-            {/* Session wise  */}
-            <div>
-              <h3>Session</h3>
-              <Select
-                style={{ width: 170 }}
-                placeholder="Select Session"
-                onChange={handleSessionChange}
-                value={selectedSession}
-              >
-                {sessionOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </Select>
-              <p onClick={handleReset3} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
-            </div>
-            {/* Status wise  */}
-            <div>
-              <h3>Status</h3>
-              <Select
-                style={{ width: 170 }}
-                placeholder="Select Session"
-                onChange={handleStatusChange}
-                value={selectedStatus}
-              >
-                {statusOptions.map((option) => (
-                  <Select.Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Select.Option>
-                ))}
-              </Select>
-              <p onClick={handleReset4} className='cursor-pointer text-end text-red-500 font-thin text-xs'>Reset</p>
-            </div>
-          </div>
-
-          <div className='w-1/4 flex gap-3 relative top-[-50px]'>
-            <label htmlFor="Search">Search
-              <Input.Search
-                placeholder="Search"
-                onChange={handleSearch}
-              />
-            </label>
-            <div>
-              {/* Reset button */}
-              <h3>Reset</h3>
-              <Button title='Reset All Filter' onClick={handleResetFilters}><RedoOutlined /></Button>
-            </div>
-          </div>
-        </div>
-        {/* Rest of the code... */}
         <div ref={tableHeader}>
           <PageHeader
             onBack={() => window.history.back()}
@@ -407,7 +182,7 @@ export default function DataTable({ config, extra = [] }) {
         <Table
           columns={tableColumns}
           rowKey={(item) => item._id}
-          dataSource={applyFilters(filteredBySearch)}
+          dataSource={dataSource}
           pagination={pagination}
           loading={listIsLoading}
           onChange={handelDataTableLoad}

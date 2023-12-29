@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import DefaultLayout from '../DefaultLayout';
-
 import SidePanel from '@/components/SidePanel';
 import { Layout } from 'antd';
 import { useCrudContext } from '@/context/crud';
