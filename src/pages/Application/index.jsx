@@ -1,9 +1,13 @@
 import {
-  DownloadOutlined, LeftOutlined, RightOutlined
-  , PrinterOutlined
+  DownloadOutlined, LeftOutlined, RightOutlined,
+  PrinterOutlined
 } from '@ant-design/icons';
 import { Tag, Modal, Image, Button, Select } from 'antd';
+<<<<<<< Updated upstream
 
+=======
+import dayjs from 'dayjs';
+>>>>>>> Stashed changes
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
@@ -15,9 +19,35 @@ export default function Lead() {
   const [previewVisible1, setPreviewVisible1] = useState(false);
   const [previewImages, setPreviewImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [previewVisible2, setPreviewVisible2] = useState(false); // Second Modal
+  const [previewVisible2, setPreviewVisible2] = useState(false);
   const [studentConversation, setStudentConversation] = useState([]);
+<<<<<<< Updated upstream
 
+=======
+  const [filter, setFilter] = useState({
+    status: '', // Add other filter options as needed
+  });
+  const [apiData, setApiData] = useState([]);
+  const handleFilterChange = (key, value) => {
+    setFilter((prevFilter) => ({ ...prevFilter, [key]: value }));
+    console.log('Filter in Lead component:', { ...filter, [key]: value });
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('Filter before fetching data:', filter);
+        const queryParams = new URLSearchParams(filter);
+        const response = await fetch(`http://localhost:5000/api/lead/filter?${queryParams.toString()}`);
+        const data = await response.json();
+        setApiData(data.result);
+      } catch (error) {
+        console.error('Error fetching data from the API:', error);
+      }
+    };
+
+    fetchData();
+  }, [filter]);
+>>>>>>> Stashed changes
 
   const handleImagePreview = (imageData, index) => {
     setPreviewImages(imageData);
@@ -238,7 +268,6 @@ export default function Lead() {
   ];
 
   const dataTableColumns = [
-
     {
       title: 'S.No.',
       dataIndex: '',
@@ -362,10 +391,20 @@ export default function Lead() {
       title: translate('Due amount'),
       dataIndex: 'customfields',
       render: (customfields) => {
+<<<<<<< Updated upstream
         const totalCourseFee = parseFloat(customfields.total_course_fee) || 0;
         const paidAmount = parseFloat(customfields.paid_amount) || 0;
         const dueAmount = totalCourseFee - paidAmount;
         return <span>{dueAmount.toFixed(2)}</span>; // Adjust the display format as needed
+=======
+        if (customfields && customfields.total_paid_amount !== undefined && customfields.paid_amount !== undefined) {
+          const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
+          const paidAmount = parseFloat(customfields.paid_amount) || 0;
+          const dueAmount = totalPaidAmount - paidAmount;
+          return <span>{dueAmount.toFixed(2)}</span>; // Modify the display format as needed
+        }
+        return <span>Unavailable</span>; // or another fallback value
+>>>>>>> Stashed changes
       },
     },
     {
@@ -463,6 +502,18 @@ export default function Lead() {
   };
   return (
     <>
+<<<<<<< Updated upstream
+=======
+      <Select
+        style={{ width: 200, marginBottom: 16 }}
+        placeholder="Select status"
+        onChange={(value) => handleFilterChange('status', value)}
+      >
+        <Select.Option value="New">New</Select.Option>
+        <Select.Option value="Cancel">Cancel</Select.Option>
+        {/* Add more options as needed */}
+      </Select>
+>>>>>>> Stashed changes
       <Modal
         visible={previewVisible1}
         onCancel={() => setPreviewVisible1(false)}
@@ -540,7 +591,6 @@ export default function Lead() {
             }}
           />
         </div>
-
       </Modal>
       <Modal
         visible={previewVisible2}
@@ -562,8 +612,14 @@ export default function Lead() {
         createForm={<LeadForm />}
         updateForm={<EditForm isUpdateForm={true} />}
         config={config}
+<<<<<<< Updated upstream
 
+=======
+        filter={filter}
+        data={apiData}
+>>>>>>> Stashed changes
       />
+
     </>
 
   );

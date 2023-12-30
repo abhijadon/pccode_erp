@@ -7,7 +7,12 @@
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
     "@ant-design/pro-layout": "^7.17.12",
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
     "@mobiscroll/react-lite": "^4.10.9",
+    "@mui/icons-material": "^5.15.2",
+    "@mui/material": "^5.15.2",
+    "@mui/system": "^5.15.2",
     "@rollup/plugin-dynamic-import-vars": "^2.1.0",
     "@vitejs/plugin-react": "^4.0.4",
     "antd": "^5.11.0",

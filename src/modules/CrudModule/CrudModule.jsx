@@ -31,25 +31,24 @@ function SidePanelTopContent({ config, formElements, withUpload }) {
   const [labels, setLabels] = useState('');
   useEffect(() => {
     if (currentItem) {
-      const currentlabels = entityDisplayLabels.map((x) => currentItem[x]).join(' ');
-
-      setLabels(currentlabels);
+      const currentLabels = entityDisplayLabels.map((x) => currentItem[x]).join(' ');
+      setLabels(currentLabels);
     }
-  }, [currentItem]);
+  }, [currentItem, entityDisplayLabels]);
 
   const removeItem = () => {
     dispatch(crud.currentAction({ actionType: 'delete', data: currentItem }));
     modal.open();
   };
+
   const editItem = () => {
     dispatch(crud.currentAction({ actionType: 'update', data: currentItem }));
     editBox.open();
   };
 
-  const show = isReadBoxOpen || isEditBoxOpen ? { opacity: 1 } : { opacity: 0 };
   return (
     <>
-      <Row style={show}>
+      <Row style={isReadBoxOpen || isEditBoxOpen ? { opacity: 1 } : { opacity: 0 }}>
         <Col span={13}>
           <p style={{ marginBottom: '10px' }}>{labels}</p>
         </Col>
@@ -87,16 +86,11 @@ function SidePanelTopContent({ config, formElements, withUpload }) {
 
 function FixHeaderPanel({ config }) {
   const { crudContextAction } = useCrudContext();
-
   const { collapsedBox } = crudContextAction;
 
   const addNewItem = () => {
     collapsedBox.close();
   };
-
-  // const collapsePanel = () => {
-  //   panel.collapse();
-  // };
 
   return (
     <Row gutter={8}>
@@ -110,7 +104,7 @@ function FixHeaderPanel({ config }) {
   );
 }
 
-function CrudModule({ config, createForm, updateForm, withUpload = false }) {
+function CrudModule({ config, createForm, updateForm, withUpload = false, filter }) {
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -128,7 +122,7 @@ function CrudModule({ config, createForm, updateForm, withUpload = false }) {
         <SidePanelTopContent config={config} formElements={updateForm} withUpload={withUpload} />
       }
     >
-      <DataTable config={config} />
+      <DataTable config={config} extra={[]} filter={filter} />
       <DeleteModal config={config} />
     </CrudLayout>
   );

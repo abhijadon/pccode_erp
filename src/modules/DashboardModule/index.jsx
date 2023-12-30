@@ -213,7 +213,11 @@ export default function DashboardModule() {
   });
   const invoiceCard = (
     <SummaryCard
+<<<<<<< Updated upstream
       title={translate('Total Course Fee')}
+=======
+      title={translate('Total course fee')}
+>>>>>>> Stashed changes
       tagColor={'purple'}
       prefix={translate('Total Amount')}
       isLoading={paymentLoading}

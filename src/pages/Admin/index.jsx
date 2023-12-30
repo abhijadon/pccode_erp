@@ -21,6 +21,11 @@ export default function Admin() {
   ];
 
   const dataTableColumns = [
+    {
+      title: 'S.No.',
+      dataIndex: '',
+      render: (text, record, index) => index + 1,
+    },
     { title: translate('first name'), dataIndex: 'name' },
     { title: translate('last name'), dataIndex: 'surname' },
     { title: translate('Email'), dataIndex: 'email' },
