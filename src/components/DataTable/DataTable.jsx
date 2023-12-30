@@ -1,6 +1,6 @@
-import { useCallback, useEffect } from 'react';
-import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button } from 'antd';
+import { useCallback, useEffect, useState } from 'react';
+import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined, RedoOutlined } from '@ant-design/icons';
+import { Dropdown, Table, Button, Input, Select } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -28,6 +28,12 @@ function AddNewItem({ config }) {
 }
 
 export default function DataTable({ config, extra = [] }) {
+  // State variables for filtering
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedInstitute, setSelectedInstitute] = useState('');
+  const [selectedUniversity, setSelectedUniversity] = useState('');
+  const [selectedSession, setSelectedSession] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
@@ -132,12 +138,9 @@ export default function DataTable({ config, extra = [] }) {
   const dispatch = useDispatch();
 
   const handelDataTableLoad = useCallback((pagination) => {
-    const options = {
-      page: pagination.current || 1,
-      items: pagination.pageSize || 10
-    };
+    const options = { page: pagination.current || 1, items: pagination.pageSize || 10 };
     dispatch(crud.list({ entity, options }));
-  }, [dispatch, entity]);
+  }, []);
 
   const dispatcher = () => {
     dispatch(crud.list({ entity }));
@@ -156,12 +159,24 @@ export default function DataTable({ config, extra = [] }) {
     items
   );
 
+  const universityOptions = [
+    { label: 'SPU', value: 'SPU' },
+    { label: 'CU', value: 'CU' },
+    { label: 'SGVU', value: 'SGVU' },
+    // Add more university options as needed
+  ];
+  const instituteOptions = [
+    { label: 'HES', value: 'HES' },
+    { label: 'DES', value: 'DES' },
+    // Add more institute options as needed
+  ];
 
+  const sessionOptions = [
+    { label: '2023', value: '2023' },
+    { label: '2024', value: '2024' },
+    // Add more institute options as needed
+  ];
 
-<<<<<<< Updated upstream
-
-
-=======
   const statusOptions = [
     { label: 'New', value: 'New' },
     { label: 'Cancel', value: 'Cancel' },
@@ -286,13 +301,10 @@ export default function DataTable({ config, extra = [] }) {
   const filteredData = applyFilters(filteredBySearch);
 
   const conditionalDataSource = entity === 'lead' ? filteredData : dataSource;
->>>>>>> Stashed changes
 
   return (
     <>
       <div className='-mt-6'>
-<<<<<<< Updated upstream
-=======
         {entity === 'lead' && (
           <div className='flex justify-between mb-24 items-center'>
             {/* Filter condition using select for Institute */}
@@ -386,7 +398,6 @@ export default function DataTable({ config, extra = [] }) {
         )}
 
         {/* Rest of the code... */}
->>>>>>> Stashed changes
         <div ref={tableHeader}>
           <PageHeader
             onBack={() => window.history.back()}
@@ -406,11 +417,7 @@ export default function DataTable({ config, extra = [] }) {
         <Table
           columns={tableColumns}
           rowKey={(item) => item._id}
-<<<<<<< Updated upstream
-          dataSource={dataSource}
-=======
           dataSource={conditionalDataSource}
->>>>>>> Stashed changes
           pagination={pagination}
           loading={listIsLoading}
           onChange={handelDataTableLoad}

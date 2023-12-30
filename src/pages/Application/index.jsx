@@ -1,58 +1,24 @@
 import {
-  DownloadOutlined, LeftOutlined, RightOutlined,
-  PrinterOutlined
+  DownloadOutlined, LeftOutlined, RightOutlined
+  , PrinterOutlined
 } from '@ant-design/icons';
-import { Tag, Modal, Image, Button, Select } from 'antd';
-<<<<<<< Updated upstream
-
-=======
-import dayjs from 'dayjs';
->>>>>>> Stashed changes
+import { Tag, Modal, Image, Space, Button } from 'antd';
+import dayjs from 'dayjs'; // Import dayjs if not already imported
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import LeadForm from '@/forms/LeadForm';
 import useLanguage from '@/locale/useLanguage';
 import EditForm from '../../forms/EdtiForm';
-import { useState, useEffect } from 'react';
-
+import { useState } from 'react';
 export default function Lead() {
   const translate = useLanguage();
-  const [previewVisible1, setPreviewVisible1] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImages, setPreviewImages] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [previewVisible2, setPreviewVisible2] = useState(false);
-  const [studentConversation, setStudentConversation] = useState([]);
-<<<<<<< Updated upstream
-
-=======
-  const [filter, setFilter] = useState({
-    status: '', // Add other filter options as needed
-  });
-  const [apiData, setApiData] = useState([]);
-  const handleFilterChange = (key, value) => {
-    setFilter((prevFilter) => ({ ...prevFilter, [key]: value }));
-    console.log('Filter in Lead component:', { ...filter, [key]: value });
-  };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('Filter before fetching data:', filter);
-        const queryParams = new URLSearchParams(filter);
-        const response = await fetch(`http://localhost:5000/api/lead/filter?${queryParams.toString()}`);
-        const data = await response.json();
-        setApiData(data.result);
-      } catch (error) {
-        console.error('Error fetching data from the API:', error);
-      }
-    };
-
-    fetchData();
-  }, [filter]);
->>>>>>> Stashed changes
 
   const handleImagePreview = (imageData, index) => {
     setPreviewImages(imageData);
     setCurrentImageIndex(index);
-    setPreviewVisible1(true);
+    setPreviewVisible(true);
   };
 
   const handleNext = () => {
@@ -64,56 +30,20 @@ export default function Lead() {
       prevIndex === 0 ? previewImages.length - 1 : prevIndex - 1
     );
   };
-  const getConversationHistory = (record) => {
-    const currentRemark = record.customfields && record.customfields.remark;
-    const previousRemarks = record.previousRemarks || []; // Assuming you have previous remarks stored
 
-    // Simulated conversation data for demonstration purposes
-    const conversationData = [];
-
-    if (currentRemark) {
-      conversationData.push({
-        message: currentRemark,
-        date: new Date().toISOString(), // Current date for the current remark
-      });
-    } else {
-      conversationData.push({
-        message: 'No current remark found',
-        date: new Date().toISOString(),
-      });
-    }
-
-    // Add previous remarks to conversation data
-    previousRemarks.forEach((remark, index) => {
-      conversationData.push({
-        message: `Previous Remark ${index + 1}: ${remark}`, // Modify the format as needed
-        date: '2023-12-23T09:30:00Z', // Use the appropriate date for previous remarks
-      });
-    });
-
-    return conversationData;
-
-  };
-  const handleViewStudentConversation = (record) => {
-    const conversationData = getConversationHistory(record);
-    setStudentConversation(conversationData);
-    setPreviewVisible2(true); // Open the second modal
-  };
-  const handleModal1Cancel = () => {
-    setPreviewVisible2(false);
-    setStudentConversation([]); // Reset conversation state for modal 1
-  };
   const entity = 'lead';
   const searchConfig = {
     displayLabels: ['full_name', 'company', 'contact.email'],
     searchFields: ['full_name', 'company', 'contact.email'],
-    outputValue: '\_id',
+    outputValue: '_id',
   };
+
+
 
   const handleDownload = (base64ImageData, imageName) => {
     try {
       // Check if the provided data is a valid Base64 string
-      const isBase64 = /^data:image\/([a-zA-Z]_);base64,([^\/\r\n]_)/.test(base64ImageData);
+      const isBase64 = /^data:image\/([a-zA-Z]*);base64,([^\/\r\n]*)/.test(base64ImageData);
 
       if (!isBase64) {
         console.error('Invalid Base64 data provided.');
@@ -146,16 +76,17 @@ export default function Lead() {
     } catch (error) {
       console.error('Error while handling download:', error);
     }
-
   };
   const handlePrint = (imageUrl) => {
-    const printWindow = window.open('', '\_blank');
+    const printWindow = window.open('', '_blank');
     printWindow.document.write(
       `<img src="${imageUrl}" style="max-width:100%;" />`
     );
     printWindow.document.close();
     printWindow.print();
   };
+
+
 
   const entityDisplayLabels = ['number', 'company'];
 
@@ -242,15 +173,8 @@ export default function Lead() {
       dataIndex: 'customfields.paid_amount',
     },
     {
-      // Other columns...
       title: translate('Due amount'),
-      dataIndex: 'customfields',
-      render: (customfields) => {
-        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
-        const paidAmount = parseFloat(customfields.paid_amount) || 0;
-        const dueAmount = totalPaidAmount - paidAmount;
-        return <span>{dueAmount.toFixed(2)}</span>; // Modify the display format as needed
-      },
+      dataIndex: 'customfields.due_amount',
     },
     {
       title: translate('Total Paid amount'),
@@ -264,10 +188,10 @@ export default function Lead() {
       title: translate('status'),
       dataIndex: 'status',
     },
-
   ];
 
   const dataTableColumns = [
+
     {
       title: 'S.No.',
       dataIndex: '',
@@ -372,58 +296,30 @@ export default function Lead() {
       key: 'total_course_fee'
     },
     {
-      title: translate('Total Paid amount'),
-      dataIndex: 'customfields',
-      key: 'total_paid_amount',
-      render: (customfields) => {
-        const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
-        const paidAmount = parseFloat(customfields.paid_amount) || 0;
-        const sum = totalPaidAmount + paidAmount;
-        return <span>{sum.toFixed(2)}</span>; // Adjust the display format as needed
-      },
-    },
-    {
       title: translate('paid amount'),
       dataIndex: ['customfields', 'paid_amount'],
       key: 'paid_amount'
     },
     {
       title: translate('Due amount'),
-      dataIndex: 'customfields',
-      render: (customfields) => {
-<<<<<<< Updated upstream
-        const totalCourseFee = parseFloat(customfields.total_course_fee) || 0;
-        const paidAmount = parseFloat(customfields.paid_amount) || 0;
-        const dueAmount = totalCourseFee - paidAmount;
-        return <span>{dueAmount.toFixed(2)}</span>; // Adjust the display format as needed
-=======
-        if (customfields && customfields.total_paid_amount !== undefined && customfields.paid_amount !== undefined) {
-          const totalPaidAmount = parseFloat(customfields.total_paid_amount) || 0;
-          const paidAmount = parseFloat(customfields.paid_amount) || 0;
-          const dueAmount = totalPaidAmount - paidAmount;
-          return <span>{dueAmount.toFixed(2)}</span>; // Modify the display format as needed
-        }
-        return <span>Unavailable</span>; // or another fallback value
->>>>>>> Stashed changes
-      },
+      dataIndex: ['customfields', 'due_amount'],
+      key: 'due_amount'
+    },
+    {
+      title: translate('Total Paid amount'),
+      dataIndex: ['customfields', 'total_paid_amount'],
+      key: 'total_paid_amount'
     },
     {
       title: translate('Fee receipt screenshot'),
       dataIndex: ['customfields', 'upload_fee_receipt_screenshot'],
-      key: 'upload_fee_receipt_screenshot',
-      render: (screenshot) => (
-        screenshot && (
-          <a href={screenshot} target="_blank" rel="noopener noreferrer" download>
-            <DownloadOutlined style={{ fontSize: '20px', color: '#083662', cursor: 'pointer' }} />
-          </a>
-        )
-      ),
+      key: 'upload_fee_receipt_screenshot'
     },
     {
       title: translate('Student Document'),
       dataIndex: 'image',
       key: 'image',
-      render: (imageData) => {
+      render: (imageData, record, index) => {
         if (Array.isArray(imageData) && imageData.length > 0) {
           return (
             <div style={{ display: 'flex' }}>
@@ -448,18 +344,7 @@ export default function Lead() {
       dataIndex: ['customfields', 'send_fee_receipt'],
       key: 'send_fee_receipt',
     },
-    {
-      title: 'Remark',
-      dataIndex: ['customfields', 'remark'],
-      key: 'remark',
-      render: (remark, record) => (
-        <div>
-          <Button onClick={() => handleViewStudentConversation(record)}>
-            Remark
-          </Button>
-        </div>
-      ),
-    },
+
     {
       title: translate('Status'),
       dataIndex: ['customfields', 'status'],
@@ -478,7 +363,16 @@ export default function Lead() {
       },
 
     },
-
+    {
+      title: 'Remark',
+      dataIndex: ['customfields', 'remark'],
+      key: 'remark',
+    },
+    {
+      title: translate('Created'),
+      dataIndex: 'created',
+      render: (date) => dayjs(date).format('DD/MM/YYYY'),
+    },
   ];
 
   const Labels = {
@@ -502,21 +396,10 @@ export default function Lead() {
   };
   return (
     <>
-<<<<<<< Updated upstream
-=======
-      <Select
-        style={{ width: 200, marginBottom: 16 }}
-        placeholder="Select status"
-        onChange={(value) => handleFilterChange('status', value)}
-      >
-        <Select.Option value="New">New</Select.Option>
-        <Select.Option value="Cancel">Cancel</Select.Option>
-        {/* Add more options as needed */}
-      </Select>
->>>>>>> Stashed changes
+
       <Modal
-        visible={previewVisible1}
-        onCancel={() => setPreviewVisible1(false)}
+        visible={previewVisible}
+        onCancel={() => setPreviewVisible(false)}
         footer={null}
         width={800}
         centered
@@ -591,36 +474,14 @@ export default function Lead() {
             }}
           />
         </div>
+
       </Modal>
-      <Modal
-        visible={previewVisible2}
-        onCancel={handleModal1Cancel}
-        footer={null}
-        width={800}
-        centered
-      >
-        {/* Content for the first modal */}
-        <div>
-          {studentConversation.map((conversation, index) => (
-            <p key={index}>
-              {conversation.message} - {new Date(conversation.date).toLocaleDateString()}
-            </p>
-          ))}
-        </div>
-      </Modal>
+
       <CrudModule
         createForm={<LeadForm />}
         updateForm={<EditForm isUpdateForm={true} />}
         config={config}
-<<<<<<< Updated upstream
-
-=======
-        filter={filter}
-        data={apiData}
->>>>>>> Stashed changes
       />
-
     </>
-
   );
 }
