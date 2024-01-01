@@ -1,5 +1,4 @@
 import { lazy, Suspense } from 'react';
-
 import { useSelector } from 'react-redux';
 import { selectAuth } from '@/redux/auth/selectors';
 import { AppContextProvider } from '@/context/appContext';
@@ -12,7 +11,7 @@ const ErpApp = lazy(() => import('./ErpApp'));
 export default function ERP_SODEOs() {
   const { isLoggedIn } = useSelector(selectAuth);
 
-  if (!isLoggedIn)
+  if (!isLoggedIn) {
     return (
       <Localization>
         <Suspense fallback={<PageLoader />}>
@@ -20,7 +19,7 @@ export default function ERP_SODEOs() {
         </Suspense>
       </Localization>
     );
-  else {
+  } else {
     return (
       <Localization>
         <AppContextProvider>
