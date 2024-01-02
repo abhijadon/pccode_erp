@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
 import { selectListItems } from '@/redux/crud/selectors';
 import useLanguage from '@/locale/useLanguage';
-import { generate as uniqueId } from 'shortid';
 import useResponsiveTable from '@/hooks/useResponsiveTable';
 import { useCrudContext } from '@/context/crud';
 import ExcelJS from 'exceljs';

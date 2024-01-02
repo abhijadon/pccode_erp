@@ -15,19 +15,32 @@ export default function DashboardModule() {
   const [institutes, setInstitutes] = useState([]);
   const [universities, setUniversities] = useState([]);
   const [counselors, setCounselors] = useState([]);
-
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState('month');
   const [selectedInstitute, setSelectedInstitute] = useState('');
   const [selectedUniversity, setSelectedUniversity] = useState('');
   const [selectedCounselor, setSelectedCounselor] = useState('');
   const [filteredPaymentData, setFilteredPaymentData] = useState({});
   const [universityExistenceMessage, setUniversityExistenceMessage] = useState('');
 
+  const handleTimePeriodChange = (value) => {
+    setSelectedTimePeriod(value);
+  };
+
   const handleInstituteChange = (value) => {
     setSelectedInstitute(value);
   };
 
-  const handleUniversityChange = (value) => {
+  const handleUniversityChange = async (value) => {
     setSelectedUniversity(value);
+    setUniversityExistenceMessage(''); // Reset the university existence message
+
+    // Check if the selected university exists in the dataset
+    if (value && universities.indexOf(value) === -1) {
+      setUniversityExistenceMessage(`The specified university (${value}) does not exist in the dataset.`);
+      setFilteredPaymentData({ total_course_fee: 0 }); // Set payment to 0
+    } else {
+      setFilteredPaymentData({}); // Clear filtered data
+    }
   };
 
   const handleCounselorChange = (value) => {
@@ -41,7 +54,6 @@ export default function DashboardModule() {
     setFilteredPaymentData({});
     setUniversityExistenceMessage('');
   };
-
   const fetchData = async () => {
     try {
       const response = await fetch('https://sode-erp.onrender.com/api/payment/list');
@@ -65,19 +77,20 @@ export default function DashboardModule() {
     fetchData();
   }, []);
 
+
   useEffect(() => {
     const fetchData = async () => {
       if (selectedInstitute || selectedUniversity || selectedCounselor) {
         try {
           const response = await fetch(
-            `https://sode-erp.onrender.com/api/payment/summary?institute_name=${selectedInstitute}&university_name=${selectedUniversity}&counselor_email=${selectedCounselor}`
+            `https://sode-erp.onrender.com/api/payment/summary?type=${selectedTimePeriod}&institute_name=${selectedInstitute}&university_name=${selectedUniversity}&counselor_email=${selectedCounselor}`
           );
           const data = await response.json();
 
           if (data.success && data.result !== null) {
             setFilteredPaymentData(data.result || {});
           } else {
-            setFilteredPaymentData({});
+            setFilteredPaymentData({ total_course_fee: 0 }); // Set payment to 0
             message.error(
               `The specified university (${selectedUniversity}) does not exist in the dataset.`
             );
@@ -88,17 +101,13 @@ export default function DashboardModule() {
       }
     };
     fetchData();
-  }, [selectedInstitute, selectedUniversity, selectedCounselor]);
+  }, [selectedInstitute, selectedUniversity, selectedCounselor, selectedTimePeriod]);
   const { result: invoiceResult, isLoading: invoiceLoading } = useFetch(() =>
     request.summary({ entity: 'invoice' })
   );
 
   const { result: quoteResult, isLoading: quoteLoading } = useFetch(() =>
     request.summary({ entity: 'quote' })
-  );
-
-  const { result: offerResult, isLoading: offerLoading } = useFetch(() =>
-    request.summary({ entity: 'offer' })
   );
 
   const { result: paymentResult, isLoading: paymentLoading } = useFetch(() =>
@@ -157,42 +166,18 @@ export default function DashboardModule() {
       title: translate('University preview'),
     },
     {
-      result: offerResult,
-      isLoading: offerLoading,
-      entity: 'payment',
-      title: translate('offers preview'),
-    },
-    {
       result: paymentResult,
       isLoading: paymentLoading,
       entity: 'payment',
-      title: translate('payments preview'),
+      title: translate('Status preview'),
     },
   ];
 
-  const cards = entityData.map((data, index) => {
-    const { result, entity, isLoading } = data;
-
-    if (entity === 'offer') return null;
-
-    return (
-      <SummaryCard
-        key={index}
-        title={data?.entity === 'payment' ? translate('Payment') : translate(data?.entity)}
-        tagColor={
-          data?.entity === 'invoice' ? 'cyan' : data?.entity === 'quote' ? 'purple' : 'green'
-        }
-        prefix={translate('This month')}
-        isLoading={isLoading}
-        tagContent={result?.total && moneyFormatter({ amount: result?.total })}
-      />
-    );
-  });
 
   const statisticCards = entityData.map((data, index) => {
     const { result, entity, isLoading, title } = data;
 
-    if (entity === 'payment') return null;
+    if (entity === 'qoute') return null;
 
     return (
       <PreviewCard
@@ -255,7 +240,6 @@ export default function DashboardModule() {
     <>
       {universityExistenceMessage && (
         <Row gutter={[32, 32]}>
-
           <Col span={24}>
             <div style={{ color: 'red' }}>{universityExistenceMessage}</div>
           </Col>
@@ -288,7 +272,11 @@ export default function DashboardModule() {
             </Select.Option>
           ))}
         </Select>
-
+        <Select value={selectedTimePeriod} onChange={handleTimePeriodChange} className='w-36'>
+          <Select.Option value='week'>Week</Select.Option>
+          <Select.Option value='month'>Month</Select.Option>
+          <Select.Option value='year'>Year</Select.Option>
+        </Select>
         <Button onClick={resetData}>Reset All</Button>
       </Row>
 

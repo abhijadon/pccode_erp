@@ -2,27 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { Col, Progress, Dropdown, Menu, Space } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
-// const fetchData = async () => {
-//   try {
-//     const response = await fetch('http://localhost:5000/api/payment/summary');
-//     const data = await response.json();
 
-//     if (data?.instituteSpecificData && data?.universitySpecificData) {
-//       // Combine institute and university specific data into a single array
-//       return [...data.instituteSpecificData, ...data.universitySpecificData];
-//     } else if (data?.instituteSpecificData) {
-//       return data.instituteSpecificData;
-//     } else if (data?.universitySpecificData) {
-//       return data.universitySpecificData;
-//     } else {
-//       console.error('No specific data found in the response');
-//       return [];
-//     }
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//     return [];
-//   }
-// };
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -152,7 +132,7 @@ export default function PreviewCard({
     if (entity === 'invoice') {
       defaultStats = defaultInvoiceStatistics;
     } else {
-      defaultStats = entity === 'status' ? defaultStatus : defaultStatistics;
+      defaultStats = entity === 'payment' ? defaultStatus : defaultStatistics;
     }
 
     return defaultStats.map((defaultStat) => {
