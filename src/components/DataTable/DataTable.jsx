@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button, Select, Input } from 'antd';
+import { Dropdown, Table, Button, Select, Input, Modal, Radio } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -9,7 +9,7 @@ import useLanguage from '@/locale/useLanguage';
 import { generate as uniqueId } from 'shortid';
 import useResponsiveTable from '@/hooks/useResponsiveTable';
 import { useCrudContext } from '@/context/crud';
-
+import ExcelJS from 'exceljs';
 
 const { Option } = Select;
 
@@ -36,6 +36,9 @@ export default function DataTable({ config, extra = [] }) {
   const { crudContextAction } = useCrudContext();
   const { panel, collapsedBox, modal, readBox, editBox, advancedBox } = crudContextAction;
   const translate = useLanguage();
+  const [downloadCount, setDownloadCount] = useState(0); // Start with 0 to indicate dynamic count
+  const [exportFormat, setExportFormat] = useState('xlsx'); // Default export format is XLSX
+  const [exportModalVisible, setExportModalVisible] = useState(false);
   const [selectOptions, setSelectOptions] = useState({
     instituteNames: [],
     universityNames: [],
@@ -224,12 +227,83 @@ export default function DataTable({ config, extra = [] }) {
     }));
   };
 
+  const getDataByPath = (item, path) => {
+    if (!path) return null;
 
+    const pathArray = Array.isArray(path) ? path : path.split('.');
+    let value = item;
+
+    for (const key of pathArray) {
+      value = value[key];
+      if (value === undefined || value === null) {
+        return null;
+      }
+    }
+
+    return value;
+  };
   const handleSearch = (value) => {
     setSearchQuery(value);
 
     // Trigger data loading with the updated search query
     handelDataTableLoad({ current: 1, pageSize: pagination.pageSize }, value);
+  };
+
+  const exportToExcel = async () => {
+    try {
+      setExportModalVisible(false);
+
+      const apiUrl = `https://sode-erp.onrender.com/api/lead/filter?entity=${entity}`;
+      const response = await fetch(apiUrl);
+      const apiData = await response.json();
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sheet 1');
+
+      // Remove Action column from the dataTableColumns array
+      const columnsWithoutAction = dataTableColumns.filter((column) => column.title !== 'Action');
+
+      // Add headers to the worksheet
+      const headers = columnsWithoutAction.map((column) => column.title);
+      worksheet.addRow(headers);
+
+      // Add data rows to the worksheet
+      const rowsToDownload = downloadCount > 0 ? apiData.result.slice(0, downloadCount) : apiData.result;
+      rowsToDownload.forEach((item) => {
+        const rowData = columnsWithoutAction.map((column) => {
+          const dataIndex = column.dataIndex;
+          const cellData = getDataByPath(item, dataIndex);
+          return cellData;
+        });
+        worksheet.addRow(rowData);
+      });
+
+      // Create a blob from the Excel file
+      const blob = await workbook.xlsx.writeBuffer();
+
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `exported_data.${exportFormat}`);
+      document.body.appendChild(link);
+
+      // Trigger the download
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+    }
+  };
+
+  const handleExportModalOk = () => {
+    exportToExcel();
+  };
+
+  const handleExportModalCancel = () => {
+    setExportModalVisible(false);
   };
 
   return (
@@ -303,8 +377,35 @@ export default function DataTable({ config, extra = [] }) {
             onChange={(e) => handleSearch(e.target.value)}
             style={{ width: 200, marginRight: 16 }}
           />
+          <Select
+            placeholder="Select Rows to Download"
+            style={{ width: 200, marginRight: 16 }}
+            onChange={(value) => setDownloadCount(value)}
+            value={downloadCount}
+          >
+            {[10, 20, 50, 100].map((count) => (
+              <Select.Option key={count} value={count}>
+                {count}
+              </Select.Option>
+            ))}
+          </Select>
+          <Button onClick={() => setExportModalVisible(true)} type="primary">
+            Export to Excel
+          </Button>
         </div>
       )}
+      <Modal
+        title="Select Export Format"
+        visible={exportModalVisible}
+        onOk={handleExportModalOk}
+        onCancel={handleExportModalCancel}
+      >
+        <Radio.Group onChange={(e) => setExportFormat(e.target.value)} value={exportFormat}>
+          <Radio value="xlsx">XLSX</Radio>
+          <Radio value="csv">CSV</Radio>
+          <Radio value="pdf" disabled>PDF</Radio>
+        </Radio.Group>
+      </Modal>
       <div className='-mt-6'>
         <div ref={tableHeader}>
           {/* Show total count based on applied filters */}
