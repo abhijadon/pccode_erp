@@ -3,6 +3,11 @@ import { Form, Select, Input, Checkbox, Radio, DatePicker, Upload } from 'antd';
 import formData from './formData';
 import { UploadOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { getCountryCallingCode, parsePhoneNumberFromString } from 'libphonenumber-js';
+
+
 const { Option } = Select;
 // Inside the component
 
@@ -11,6 +16,7 @@ export default function LeadForm() {
   const [selectedInstitute, setSelectedInstitute] = useState(null);
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [studentId, setStudentId] = useState('');
+  const [emailValidationMessage, setEmailValidationMessage] = useState('');
   const translate = useLanguage();
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -25,7 +31,16 @@ export default function LeadForm() {
       setStudentId('');
     }
   }, [selectedInstitute, selectedUniversity]);
-
+  const validateGmail = (email) => {
+    const regex = /^[a-zA-Z0-9._-]+@gmail\.com$/;
+    return regex.test(email);
+  };
+  const validatePhoneNumber = (phoneNumber) => {
+    // You can use a library like libphonenumber-js for more comprehensive validation
+    // For simplicity, this example checks if the phone number starts with a '+' followed by digits
+    const regex = /^\+\d+/;
+    return regex.test(phoneNumber);
+  };
   const generateUniqueId = () => {
     const min = 100000;
     const max = 999999;
@@ -67,6 +82,25 @@ export default function LeadForm() {
               key={field.id}
               label={field.label}
               name={field.name}
+              validateStatus={emailValidationMessage ? 'error' : ''}
+              help={emailValidationMessage}
+              rules={[
+                {
+                  type: 'email',
+                  message: 'The input is not a valid email!',
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const isGmail = validateGmail(value);
+                    if (isGmail) {
+                      setEmailValidationMessage('');
+                      return Promise.resolve();
+                    }
+                    setEmailValidationMessage('Please enter a valid Gmail address.');
+                    return Promise.reject('Invalid Gmail address');
+                  },
+                }),
+              ]}
             >
               <Input placeholder={field.place} />
             </Form.Item>
@@ -77,8 +111,28 @@ export default function LeadForm() {
               key={field.id}
               label={field.label}
               name={field.name}
+              rules={[
+                {
+                  validator: (_, value) => {
+                    const phoneNumber = value && value.replace(/\s/g, '');
+                    if (!phoneNumber) {
+                      return Promise.reject('Please enter a phone number');
+                    }
+
+                    const isValid = validatePhoneNumber(phoneNumber);
+                    if (isValid) {
+                      return Promise.resolve();
+                    } else {
+                      return Promise.reject('Invalid phone number');
+                    }
+                  },
+                },
+              ]}
             >
-              <Input placeholder={field.place} />
+              <PhoneInput
+                placeholder={field.place}
+                defaultCountry="US" // Set your default country
+              />
             </Form.Item>
           );
         case 'checkbox':
