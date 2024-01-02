@@ -128,7 +128,7 @@ export default function PreviewCard({
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/payment/summary?type=${type}`);
+      const response = await fetch(`https://sode-erp.onrender.com/api/payment/summary?type=${type}`);
       const data = await response.json();
 
       if (data?.instituteSpecificData && data?.universitySpecificData) {

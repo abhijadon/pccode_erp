@@ -1,5 +1,3 @@
-// Sidebar.js
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Drawer, Layout, Menu } from 'antd';
@@ -8,7 +6,7 @@ import useLanguage from '@/locale/useLanguage';
 import logoIcon from '@/style/images/sodelogo.png';
 import logoText from '@/style/images/sodeicon.png';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Import the useSelector hook
+import { useSelector } from 'react-redux';
 
 import {
   SettingOutlined,
@@ -23,7 +21,6 @@ import {
 
 const { Sider } = Layout;
 
-// Import the selectCurrentAdmin selector
 import { selectCurrentAdmin } from '@/redux/auth/selectors';
 
 export default function Navigation() {
@@ -49,9 +46,40 @@ function Sidebar({ collapsible }) {
   const translate = useLanguage();
   const navigate = useNavigate();
 
-  // Use the useSelector hook to get the currentAdmin from the Redux store
   const currentAdmin = useSelector(selectCurrentAdmin);
   const isAdmin = currentAdmin?.role === 'admin';
+
+  const settingsOptions = [
+    {
+      key: 'generalSettings',
+      label: <Link to={'/settings'}>{translate('general_settings')}</Link>,
+    },
+    {
+      key: 'emailTemplates',
+      label: <Link to={'/email'}>{translate('email_templates')}</Link>,
+    },
+    {
+      key: 'paymentMode',
+      label: <Link to={'/payment/mode'}>{translate('payment_mode')}</Link>,
+    },
+    {
+      key: 'taxes',
+      label: <Link to={'/taxes'}>{translate('taxes')}</Link>,
+    },
+    {
+      key: 'advancedSettings',
+      label: <Link to={'/settings/advanced'}>{translate('advanced_settings')}</Link>,
+    },
+  ];
+
+  const settingsSection = isAdmin
+    ? {
+      label: translate('Settings'),
+      key: 'settings',
+      icon: <SettingOutlined />,
+      children: settingsOptions,
+    }
+    : null;
 
   const items = [
     {
@@ -69,51 +97,26 @@ function Sidebar({ collapsible }) {
       icon: <CreditCardOutlined />,
       label: <Link to={'/payment'}>{translate('payment')}</Link>,
     },
-    // Only show these options if the user has an "admin" role
-    isAdmin && {
-      key: 'invoice',
-      icon: <FileTextOutlined />,
-      label: <Link to={'/invoice'}>{translate('invoice')}</Link>,
-    },
-    isAdmin && {
-      key: 'employee',
-      icon: <UserOutlined />,
-      label: <Link to={'/employee'}>{translate('employee')}</Link>,
-    },
-    isAdmin && {
-      key: 'admin',
-      icon: <TeamOutlined />,
-      label: <Link to={'/admin'}>{translate('admin')}</Link>,
-    },
-    {
-      label: translate('Settings'),
-      key: 'settings',
-      icon: <SettingOutlined />,
-      children: currentAdmin?.role === 'admin'
-        ? [
-          {
-            key: 'generalSettings',
-            label: <Link to={'/settings'}>{translate('general_settings')}</Link>,
-          },
-          {
-            key: 'emailTemplates',
-            label: <Link to={'/email'}>{translate('email_templates')}</Link>,
-          },
-          {
-            key: 'paymentMode',
-            label: <Link to={'/payment/mode'}>{translate('payment_mode')}</Link>,
-          },
-          {
-            key: 'taxes',
-            label: <Link to={'/taxes'}>{translate('taxes')}</Link>,
-          },
-          {
-            key: 'advancedSettings',
-            label: <Link to={'/settings/advanced'}>{translate('advanced_settings')}</Link>,
-          },
-        ]
-        : undefined,
-    }
+    ...(isAdmin
+      ? [
+        {
+          key: 'invoice',
+          icon: <FileTextOutlined />,
+          label: <Link to={'/invoice'}>{translate('invoice')}</Link>,
+        },
+        {
+          key: 'employee',
+          icon: <UserOutlined />,
+          label: <Link to={'/employee'}>{translate('employee')}</Link>,
+        },
+        {
+          key: 'admin',
+          icon: <TeamOutlined />,
+          label: <Link to={'/admin'}>{translate('admin')}</Link>,
+        },
+      ]
+      : []),
+    settingsSection,
   ].filter(Boolean);
 
   useEffect(() => {

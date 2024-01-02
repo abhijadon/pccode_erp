@@ -255,6 +255,7 @@ export default function DashboardModule() {
     <>
       {universityExistenceMessage && (
         <Row gutter={[32, 32]}>
+
           <Col span={24}>
             <div style={{ color: 'red' }}>{universityExistenceMessage}</div>
           </Col>
