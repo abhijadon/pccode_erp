@@ -14,8 +14,28 @@
   color: #4f5d75;
 }
 
-:where(.css-dev-only-do-not-override-2i2tap).ant-modal .ant-modal-close{
+element.style {
+}
+:where(.css-dev-only-do-not-override-2i2tap).ant-picker-dropdown .ant-picker-header > button {
+  color: black !important;
+}
+
+:where(.css-dev-only-do-not-override-2i2tap).ant-modal .ant-modal-close {
   background: red;
+}
+:where(.css-dev-only-do-not-override-2i2tap).ant-picker-dropdown .ant-picker-header-view {
+  flex: auto;
+  font-weight: 600;
+  line-height: 40px;
+  color: black !important;
+  background: black;
+}
+
+:where(.css-dev-only-do-not-override-2i2tap).ant-picker {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+  outline: 0;
+  width: 100% !important;
 }
 /* :where(.css-dev-only-do-not-override-2i2tap).ant-btn.ant-btn-icon-only {
   background: transparent !important;
