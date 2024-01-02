@@ -85,6 +85,27 @@ export default function DataTable({ config, extra = [] }) {
       console.error('Error fetching data:', error);
     }
   };
+
+  const resetFilters = (fieldName) => {
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [fieldName]: null,
+    }));
+    setSearchQuery('');
+    setDownloadCount(0);
+  };
+
+  const resetAllFilters = () => {
+    setSelectedFilters({
+      institute_name: null,
+      university_name: null,
+      session: null,
+      counselor_email: null,
+      status: null,
+    });
+    setSearchQuery('');
+    setDownloadCount(0);
+  };
   const items = [
     {
       label: translate('Show'),
@@ -309,91 +330,145 @@ export default function DataTable({ config, extra = [] }) {
   return (
     <>
       {entity === 'lead' && (
-        <div className='mb-14 -mt-12 -ml-9'>
-          {/* Select components for filtering */}
+        <div className='mb-14 -mt-12 -ml-9 flex flex-wrap'>
 
-          <Select
-            placeholder="Select Institute Name"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => handleSelectChange('institute_name', value)}
-            value={selectedFilters.institute_name}
-          >
-            {selectOptions.instituteNames.map((name) => (
-              <Option key={name} value={name}>
-                {name}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            placeholder="Select University Name"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => handleSelectChange('university_name', value)}
-          >
-            {selectOptions.universityNames.map((name) => (
-              <Option key={name} value={name}>
-                {name}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            placeholder="Select Session"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => handleSelectChange('session', value)}
-          >
-            {selectOptions.sessions.map((session) => (
-              <Option key={session} value={session}>
-                {session}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            placeholder="Select Counselor Email"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => handleSelectChange('counselor_email', value)}
-          >
-            {selectOptions.counselorEmails.map((email) => (
-              <Option key={email} value={email}>
-                {email}
-              </Option>
-            ))}
-          </Select>
-          <Select
-            className='mt-3.5'
-            placeholder="Select Status"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => handleSelectChange('status', value)}
-          >
-            {selectOptions.statuses.map((status) => (
-              <Option key={status} value={status}>
-                {status}
-              </Option>
-            ))}
-          </Select>
-          <Input.Search
-            className='mt-3.5'
-            placeholder="Search"
-            onSearch={handleSearch}
-            // Use onChange to trigger live search as the user types
-            onChange={(e) => handleSearch(e.target.value)}
-            style={{ width: 200, marginRight: 16 }}
-          />
-          <Select
-            placeholder="Select Rows to Download"
-            style={{ width: 200, marginRight: 16 }}
-            onChange={(value) => setDownloadCount(value)}
-            value={downloadCount}
-          >
-            {[10, 20, 50, 100].map((count) => (
-              <Select.Option key={count} value={count}>
-                {count}
-              </Select.Option>
-            ))}
-          </Select>
-          <Button onClick={() => setExportModalVisible(true)} type="primary">
-            Export to Excel
-          </Button>
+          {/* Select components for filtering */}
+          <div className="filter-container">
+            <Select
+              placeholder="Select Institute Name"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => handleSelectChange('institute_name', value)}
+              value={selectedFilters.institute_name}
+            >
+              {selectOptions.instituteNames.map((name) => (
+                <Option key={name} value={name}>
+                  {name}
+                </Option>
+              ))}
+            </Select>
+            <p
+              onClick={() => resetFilters('institute_name')}
+              className="text-red-600 font-thin text-[12px] cursor-pointer"
+            >
+              Reset Institute
+            </p>
+          </div>
+
+          <div className="filter-container">
+            <Select
+              placeholder="Select University Name"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => handleSelectChange('university_name', value)}
+              value={selectedFilters.university_name}
+            >
+              {selectOptions.universityNames.map((name) => (
+                <Option key={name} value={name}>
+                  {name}
+                </Option>
+              ))}
+            </Select>
+            <p
+              onClick={() => resetFilters('university_name')}
+              className="text-red-600 font-thin text-[12px] cursor-pointer"
+            >
+              Reset University
+            </p>
+          </div>
+
+          <div className="filter-container">
+            <Select
+              placeholder="Select Session"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => handleSelectChange('session', value)}
+              value={selectedFilters.session}
+            >
+              {selectOptions.sessions.map((session) => (
+                <Option key={session} value={session}>
+                  {session}
+                </Option>
+              ))}
+            </Select>
+            <p
+              onClick={() => resetFilters('session')}
+              className="text-red-600 font-thin text-[12px] cursor-pointer"
+            >
+              Reset Session
+            </p>
+          </div>
+
+          <div className="filter-container">
+            <Select
+              placeholder="Select Counselor Email"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => handleSelectChange('counselor_email', value)}
+              value={selectedFilters.counselor_email}
+            >
+              {selectOptions.counselorEmails.map((email) => (
+                <Option key={email} value={email}>
+                  {email}
+                </Option>
+              ))}
+            </Select>
+            <p
+              onClick={() => resetFilters('counselor_email')}
+              className="text-red-600 font-thin text-[12px] cursor-pointer"
+            >
+              Reset Counselor Email
+            </p>
+          </div>
+          <div>
+            <Select
+              className='mt-3.5'
+              placeholder="Select Status"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => handleSelectChange('status', value)}
+              value={selectedFilters.status}
+            >
+              {selectOptions.statuses.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
+            <p
+              onClick={() => resetFilters('status')}
+              className="text-red-600 font-thin text-[12px] cursor-pointer"
+            >
+              Reset Status
+            </p>
+          </div>
+          {/* Other filters... */}
+
+          <div className="filter-container">
+            <Input.Search
+              className='mt-3.5'
+              placeholder="Search"
+              onSearch={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
+              style={{ width: 200, marginRight: 16 }}
+            />
+            <Select
+              className='mt-3.5'
+              placeholder="Select Rows to Download"
+              style={{ width: 200, marginRight: 16 }}
+              onChange={(value) => setDownloadCount(value)}
+              value={downloadCount}
+            >
+              {[10, 20, 50, 100].map((count) => (
+                <Select.Option key={count} value={count}>
+                  {count}
+                </Select.Option>
+              ))}
+            </Select>
+            <Button onClick={() => setExportModalVisible(true)} type="primary">
+              Export to Excel
+            </Button>
+
+          </div>
+
         </div>
-      )}
+      )
+      }
       <Modal
         title="Select Export Format"
         visible={exportModalVisible}
@@ -407,6 +482,7 @@ export default function DataTable({ config, extra = [] }) {
         </Radio.Group>
       </Modal>
       <div className='-mt-6'>
+
         <div ref={tableHeader}>
           {/* Show total count based on applied filters */}
           <PageHeader
@@ -414,10 +490,18 @@ export default function DataTable({ config, extra = [] }) {
             title={`${DATATABLE_TITLE} (${translate('Total')} ${pagination.total || 0} )`}
             ghost={false}
             extra={[
-              <Button onClick={handelDataTableLoad} key={`${uniqueId()}`}>
+              <Button
+                key="resetAll"
+                title="Reset all"
+                onClick={() => resetAllFilters()}
+                className="text-red-600 font-thin text-[12px] float-right cursor-pointer"
+              >
+                Reset All
+              </Button>,
+              <Button key="refresh" onClick={handelDataTableLoad}>
                 {translate('Refresh')}
               </Button>,
-              <AddNewItem key={`${uniqueId()}`} config={config} />,
+              <AddNewItem key="addNewItem" config={config} />,
             ]}
             style={{
               padding: '20px 0px',
