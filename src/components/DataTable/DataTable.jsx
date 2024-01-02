@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EyeOutlined, EditOutlined, DeleteOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { Dropdown, Table, Button, Select } from 'antd';
+import { Dropdown, Table, Button, Select, Input } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import { useSelector, useDispatch } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -29,8 +29,8 @@ function AddNewItem({ config }) {
     </Button>
   );
 }
-export default function DataTable({ config, extra = [], filter }) {
-  console.log('Abhishek:', filter);
+export default function DataTable({ config, extra = [] }) {
+
 
   let { entity, dataTableColumns, DATATABLE_TITLE } = config;
   const { crudContextAction } = useCrudContext();
@@ -50,10 +50,11 @@ export default function DataTable({ config, extra = [], filter }) {
     counselor_email: null,
     status: null,
   });
-
-  const fetchData = async (entity) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const fetchData = async (entity = '') => {
     try {
-      const response = await fetch(`https://sode-erp.onrender.com/api/lead/filter?entity=${entity}`);
+      const apiUrl = `https://sode-erp.onrender.com/api/lead/filter?entity=${entity}`;
+      const response = await fetch(apiUrl);
       const apiData = await response.json();
 
       const filteredData = apiData.result.map((item) => ({
@@ -81,7 +82,6 @@ export default function DataTable({ config, extra = [], filter }) {
       console.error('Error fetching data:', error);
     }
   };
-
   const items = [
     {
       label: translate('Show'),
@@ -180,18 +180,21 @@ export default function DataTable({ config, extra = [], filter }) {
 
   const dispatch = useDispatch();
 
-  const handelDataTableLoad = useCallback((pagination) => {
-    const options = {
-      page: pagination.current || 1,
-      items: pagination.pageSize || 10,
-      filter: {
-        ...filter,
-        ...selectedFilters, // Include selected filters
-      },
-    };
-    dispatch(crud.list({ entity, options }));
-  }, [entity, filter, selectedFilters]);
+  const handelDataTableLoad = useCallback(
+    (pagination, searchQuery = '') => {
+      const options = {
+        page: pagination.current || 1,
+        items: pagination.pageSize || 10,
+        filter: {
+          ...selectedFilters,
+          q: searchQuery, // Include search query in the filter
+        },
+      };
 
+      dispatch(crud.list({ entity, options }));
+    },
+    [entity, selectedFilters]
+  );
 
 
   const dispatcher = () => {
@@ -202,11 +205,11 @@ export default function DataTable({ config, extra = [], filter }) {
   useEffect(() => {
     const controller = new AbortController();
     dispatcher();
-    fetchData();
+    fetchData(entity, searchQuery);
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [entity, searchQuery]);
 
 
   const { tableColumns, tableHeader } = useResponsiveTable(
@@ -222,12 +225,19 @@ export default function DataTable({ config, extra = [], filter }) {
   };
 
 
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+
+    // Trigger data loading with the updated search query
+    handelDataTableLoad({ current: 1, pageSize: pagination.pageSize }, value);
+  };
 
   return (
     <>
       {entity === 'lead' && (
         <div className='mb-14 -mt-12 -ml-9'>
           {/* Select components for filtering */}
+
           <Select
             placeholder="Select Institute Name"
             style={{ width: 200, marginRight: 16 }}
@@ -285,13 +295,22 @@ export default function DataTable({ config, extra = [], filter }) {
               </Option>
             ))}
           </Select>
+          <Input.Search
+            className='mt-3.5'
+            placeholder="Search"
+            onSearch={handleSearch}
+            // Use onChange to trigger live search as the user types
+            onChange={(e) => handleSearch(e.target.value)}
+            style={{ width: 200, marginRight: 16 }}
+          />
         </div>
       )}
       <div className='-mt-6'>
         <div ref={tableHeader}>
+          {/* Show total count based on applied filters */}
           <PageHeader
             onBack={() => window.history.back()}
-            title={DATATABLE_TITLE}
+            title={`${DATATABLE_TITLE} (${translate('Total')} ${pagination.total || 0} )`}
             ghost={false}
             extra={[
               <Button onClick={handelDataTableLoad} key={`${uniqueId()}`}>
@@ -308,16 +327,38 @@ export default function DataTable({ config, extra = [], filter }) {
         <Table
           columns={tableColumns}
           rowKey={(item) => item._id}
-          dataSource={dataSource.filter((item) => {
-            // Apply filter conditions based on selected filters
-            return (
-              (!selectedFilters.institute_name || item.customfields.institute_name === selectedFilters.institute_name) &&
-              (!selectedFilters.university_name || item.customfields.university_name === selectedFilters.university_name) &&
-              (!selectedFilters.session || item.customfields.session === selectedFilters.session) &&
-              (!selectedFilters.counselor_email || item.customfields.counselor_email === selectedFilters.counselor_email) &&
-              (!selectedFilters.status || item.customfields.status === selectedFilters.status)
-            );
-          })}
+          dataSource={dataSource
+            .filter((item) => {
+              // Apply filter conditions based on selected filters
+              return (
+                (!selectedFilters.institute_name || item.customfields.institute_name === selectedFilters.institute_name) &&
+                (!selectedFilters.university_name || item.customfields.university_name === selectedFilters.university_name) &&
+                (!selectedFilters.session || item.customfields.session === selectedFilters.session) &&
+                (!selectedFilters.counselor_email || item.customfields.counselor_email === selectedFilters.counselor_email) &&
+                (!selectedFilters.status || item.customfields.status === selectedFilters.status)
+              );
+            })
+            .filter((item) => {
+              // Apply search filter
+              if (!searchQuery) {
+                return true; // If no search query, include all items
+              }
+              const searchFields = ['lead_id', 'contact.phone', 'contact.email'];
+
+              return searchFields.some((field) => {
+                // Handle nested fields like 'contact.phone'
+                const fieldParts = field.split('.');
+                let fieldValue = item;
+
+                for (const part of fieldParts) {
+                  fieldValue = fieldValue[part];
+                }
+                return (
+                  fieldValue &&
+                  String(fieldValue).toLowerCase().includes(searchQuery.toLowerCase())
+                );
+              });
+            })}
           pagination={pagination}
           loading={listIsLoading}
           onChange={handelDataTableLoad}
