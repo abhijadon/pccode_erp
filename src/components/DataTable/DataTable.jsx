@@ -329,7 +329,7 @@ export default function DataTable({ config, extra = [] }) {
   return (
     <>
       {entity === 'lead' && (
-        <div className='mb-14 -mt-12 -ml-9 flex flex-wrap'>
+        <div className='mb-14 -mt-12 -ml-9 flex flex-wrap gap-4'>
 
           {/* Select components for filtering */}
           <div className="filter-container">
@@ -417,7 +417,6 @@ export default function DataTable({ config, extra = [] }) {
           </div>
           <div>
             <Select
-              className='mt-3.5'
               placeholder="Select Status"
               style={{ width: 200, marginRight: 16 }}
               onChange={(value) => handleSelectChange('status', value)}

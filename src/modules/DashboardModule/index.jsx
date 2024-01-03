@@ -56,13 +56,13 @@ export default function DashboardModule() {
   };
   const fetchData = async () => {
     try {
-      const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
+      const response = await fetch('https://sode-erp.onrender.com/api/payment/list');
       const data = await response.json();
 
       if (data.success && data.result !== null) {
-        const uniqueInstitutes = [...new Set(data.result.map((item) => item.institute_name))];
-        const uniqueUniversities = [...new Set(data.result.map((item) => item.university_name))];
-        const uniqueCounselors = [...new Set(data.result.map((item) => item.counselor_email))];
+        const uniqueInstitutes = Array.isArray(data.result) ? [...new Set(data.result.map((item) => item.institute_name))] : [];
+        const uniqueUniversities = Array.isArray(data.result) ? [...new Set(data.result.map((item) => item.university_name))] : [];
+        const uniqueCounselors = Array.isArray(data.result) ? [...new Set(data.result.map((item) => item.counselor_email))] : [];
 
         setInstitutes(uniqueInstitutes);
         setUniversities(uniqueUniversities);
@@ -245,9 +245,14 @@ export default function DashboardModule() {
           </Col>
         </Row>
       )}
-      <Row className='flex space-x-7'>
-        <Select value={selectedInstitute} onChange={handleInstituteChange} className='w-36'>
-          <Select.Option value=''>Select Institute</Select.Option>
+      <div className='flex justify-items-start items-center gap-7 mb-[30px]'>
+        <Select
+          value={selectedInstitute}
+          onChange={handleInstituteChange}
+          placeholder="Select Institute Name"
+          style={{ width: 200, marginRight: 16 }}
+        >
+          <Select.Option value=''>Select Institute Name</Select.Option>
           {institutes.map((option) => (
             <Select.Option key={option} value={option}>
               {option}
@@ -255,8 +260,12 @@ export default function DashboardModule() {
           ))}
         </Select>
 
-        <Select value={selectedUniversity} onChange={handleUniversityChange} className='w-36'>
-          <Select.Option value=''>Select University</Select.Option>
+        <Select
+          value={selectedUniversity}
+          onChange={handleUniversityChange}
+          style={{ width: 200, marginRight: 16 }}
+        >
+          <Select.Option value=''>Select University Name</Select.Option>
           {universities.map((option) => (
             <Select.Option key={option} value={option}>
               {option}
@@ -264,7 +273,11 @@ export default function DashboardModule() {
           ))}
         </Select>
 
-        <Select value={selectedCounselor} onChange={handleCounselorChange} className='w-36'>
+        <Select
+          value={selectedCounselor}
+          onChange={handleCounselorChange}
+          style={{ width: 200, marginRight: 16 }}
+        >
           <Select.Option value=''>Select Counselor</Select.Option>
           {counselors.map((option) => (
             <Select.Option key={option} value={option}>
@@ -272,13 +285,18 @@ export default function DashboardModule() {
             </Select.Option>
           ))}
         </Select>
-        <Select value={selectedTimePeriod} onChange={handleTimePeriodChange} className='w-36'>
+
+        <Select
+          value={selectedTimePeriod}
+          onChange={handleTimePeriodChange} style={{ width: 200, marginRight: 16 }}
+        >
           <Select.Option value='week'>Week</Select.Option>
           <Select.Option value='month'>Month</Select.Option>
           <Select.Option value='year'>Year</Select.Option>
         </Select>
+
         <Button onClick={resetData}>Reset All</Button>
-      </Row>
+      </div>
 
       <Row gutter={[32, 32]}>
         {invoiceCard}
