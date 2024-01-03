@@ -1,28 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Col, Progress, Dropdown, Menu, Button, Space } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
+import { Col, Progress } from 'antd';
 import useLanguage from '@/locale/useLanguage';
-// const fetchData = async () => {
-//   try {
-//     const response = await fetch('http://localhost:5000/api/payment/summary');
-//     const data = await response.json();
 
-//     if (data?.instituteSpecificData && data?.universitySpecificData) {
-//       // Combine institute and university specific data into a single array
-//       return [...data.instituteSpecificData, ...data.universitySpecificData];
-//     } else if (data?.instituteSpecificData) {
-//       return data.instituteSpecificData;
-//     } else if (data?.universitySpecificData) {
-//       return data.universitySpecificData;
-//     } else {
-//       console.error('No specific data found in the response');
-//       return [];
-//     }
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//     return [];
-//   }
-// };
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -60,13 +39,25 @@ const defaultStatistics = [
     tag: 'SGVU',
     value: 0,
   },
+  {
+    tag: 'JAIN',
+    value: 0,
+  },
+  {
+    tag: 'SVSU',
+    value: 0,
+  },
+  {
+    tag: 'NMIMS',
+    value: 0,
+  },
+  {
+    tag: 'VIGNAN',
+    value: 0,
+  },
 ];
 
 const defaultInvoiceStatistics = [
-  {
-    tag: 'Total',
-    value: 0,
-  },
   {
     tag: 'HES',
     value: 0,
@@ -80,6 +71,10 @@ const defaultInvoiceStatistics = [
 
 const defaultStatus = [
   {
+    tag: 'Total',
+    value: 0,
+  },
+  {
     tag: 'New',
     value: 0,
   },
@@ -88,7 +83,7 @@ const defaultStatus = [
     value: 0,
   },
   {
-    tag: 'Aancel',
+    tag: 'Cancel',
     value: 0,
   },
   {
@@ -128,15 +123,18 @@ export default function PreviewCard({
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/payment/summary?type=${type}`);
+      const response = await fetch(`https://sode-erp.onrender.com/api/payment/summary?type=${type}`);
       const data = await response.json();
 
-      if (data?.instituteSpecificData && data?.universitySpecificData) {
+      if (data?.instituteSpecificData && data?.universitySpecificData && data?.statusSpecificData) {
         // Combine institute and university specific data into a single array
-        return [...data.instituteSpecificData, ...data.universitySpecificData];
+        return [...data.instituteSpecificData, ...data.universitySpecificData, ...data.statusSpecificData];
       } else if (data?.instituteSpecificData) {
         return data.instituteSpecificData;
       } else if (data?.universitySpecificData) {
+        return data.universitySpecificData;
+      }
+      else if (data?.statusSpecificData) {
         return data.universitySpecificData;
       } else {
         console.error('No specific data found in the response');
@@ -152,7 +150,7 @@ export default function PreviewCard({
     if (entity === 'invoice') {
       defaultStats = defaultInvoiceStatistics;
     } else {
-      defaultStats = entity === 'status' ? defaultStatus : defaultStatistics;
+      defaultStats = entity === 'payment' ? defaultStatus : defaultStatistics;
     }
 
     return defaultStats.map((defaultStat) => {
@@ -165,19 +163,7 @@ export default function PreviewCard({
 
   const [universityCounts, setUniversityCounts] = useState([]);
   const [instituteCounts, setInstituteCounts] = useState([]);
-  const [filterType, setFilterType] = useState('month'); // State to manage filter type
 
-  const handleFilterChange = ({ key }) => {
-    setFilterType(key);
-  };
-
-  const filterMenu = (
-    <Menu onClick={handleFilterChange}>
-      <Menu.Item key="week">Week</Menu.Item>
-      <Menu.Item key="month">Month</Menu.Item>
-      <Menu.Item key="year">Year</Menu.Item>
-    </Menu>
-  );
   useEffect(() => {
     const getData = async () => {
       const data = await fetchData();
@@ -215,26 +201,7 @@ export default function PreviewCard({
   }, [type]);
 
 
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchData();
-      if (data) {
-        const counts = {};
 
-        // Prepare university-wise counts
-        data.forEach((instituteData) => {
-          const { _id, count } = instituteData[0] || {};
-          if (_id && count) {
-            counts[_id] = count;
-          }
-        });
-
-        setInstituteCounts(counts);
-      }
-    };
-
-    getData();
-  }, []);
 
 
   const universityTagCounts = useMemo(() => {
@@ -266,14 +233,7 @@ export default function PreviewCard({
       sm={{ span: 24 }}
       md={{ span: 8 }}
       lg={{ span: 8 }}
-    > <Space>
-        <Dropdown overlay={filterMenu} trigger={['click']}>
-          <button className='bg-transparent'>
-            <FilterOutlined className='text-black' /> {filterType}
-          </button>
-        </Dropdown>
-      </Space>
-      <div className="pad20">
+    >       <div className="pad20">
 
         <h3
           style={{

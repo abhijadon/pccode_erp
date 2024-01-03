@@ -149,28 +149,22 @@ const formData = [
           },
           {
             key: 'number',
-            label: 'Paid Amount',
-            name: 'customfields.paid_amount',
-            place: 'eg: 20000',
-            id: 'Paid Amount',
-            type: 'number',
-          },
-          {
-            key: 'number',
-            label: 'Due Fee Amount',
-            place: 'eg: 20000',
-            name: 'customfields.due_amount',
-            id: 'Due Fee Amount',
-            type: 'number',
-          },
-          {
-            key: 'number',
             label: 'Total Paid Amount',
             place: 'eg: 20000',
             name: 'customfields.total_paid_amount',
             id: 'Total Paid Amount',
             type: 'number',
           },
+          {
+            key: 'number',
+            label: 'Paid Amount',
+            name: 'customfields.paid_amount',
+            place: 'eg: 20000',
+            id: 'Paid Amount',
+            type: 'number',
+          },
+
+
           {
             key: 'email',
             label: 'Counselor Email',
@@ -342,28 +336,22 @@ const formData = [
           },
           {
             key: 'number',
-            label: 'Paid Amount',
-            name: 'customfields.paid_amount',
-            place: 'eg: 20000',
-            id: 'Paid Amount',
-            type: 'number',
-          },
-          {
-            key: 'number',
-            label: 'Due Fee Amount',
-            place: 'eg: 20000',
-            name: 'customfields.due_amount',
-            id: 'Due Fee Amount',
-            type: 'number',
-          },
-          {
-            key: 'number',
             label: 'Total Paid Amount',
             place: 'eg: 20000',
             name: 'customfields.total_paid_amount',
             id: 'Total Paid Amount',
             type: 'number',
           },
+          {
+            key: 'number',
+            label: 'Paid Amount',
+            name: 'customfields.paid_amount',
+            place: 'eg: 20000',
+            id: 'Paid Amount',
+            type: 'number',
+          },
+
+
           {
             key: 'email',
             label: 'Counselor Email',
