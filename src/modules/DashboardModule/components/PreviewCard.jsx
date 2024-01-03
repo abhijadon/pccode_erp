@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Col, Progress, Dropdown, Menu, Space } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
+import { Col, Progress } from 'antd';
 import useLanguage from '@/locale/useLanguage';
 
 const colours = {
@@ -40,13 +39,25 @@ const defaultStatistics = [
     tag: 'SGVU',
     value: 0,
   },
+  {
+    tag: 'JAIN',
+    value: 0,
+  },
+  {
+    tag: 'SVSU',
+    value: 0,
+  },
+  {
+    tag: 'NMIMS',
+    value: 0,
+  },
+  {
+    tag: 'VIGNAN',
+    value: 0,
+  },
 ];
 
 const defaultInvoiceStatistics = [
-  {
-    tag: 'Total',
-    value: 0,
-  },
   {
     tag: 'HES',
     value: 0,
@@ -59,6 +70,10 @@ const defaultInvoiceStatistics = [
 ];
 
 const defaultStatus = [
+  {
+    tag: 'Total',
+    value: 0,
+  },
   {
     tag: 'New',
     value: 0,
@@ -179,7 +194,6 @@ export default function PreviewCard({
             counts[_id] = count;
           }
         });
-        console.log(counts)
         setInstituteCounts(counts);
       }
     };
