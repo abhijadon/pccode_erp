@@ -68,7 +68,7 @@ const defaultStatus = [
     value: 0,
   },
   {
-    tag: 'Aancel',
+    tag: 'Cancel',
     value: 0,
   },
   {
@@ -111,12 +111,15 @@ export default function PreviewCard({
       const response = await fetch(`https://sode-erp.onrender.com/api/payment/summary?type=${type}`);
       const data = await response.json();
 
-      if (data?.instituteSpecificData && data?.universitySpecificData) {
+      if (data?.instituteSpecificData && data?.universitySpecificData && data?.statusSpecificData) {
         // Combine institute and university specific data into a single array
-        return [...data.instituteSpecificData, ...data.universitySpecificData];
+        return [...data.instituteSpecificData, ...data.universitySpecificData, ...data.statusSpecificData];
       } else if (data?.instituteSpecificData) {
         return data.instituteSpecificData;
       } else if (data?.universitySpecificData) {
+        return data.universitySpecificData;
+      }
+      else if (data?.statusSpecificData) {
         return data.universitySpecificData;
       } else {
         console.error('No specific data found in the response');
@@ -145,19 +148,7 @@ export default function PreviewCard({
 
   const [universityCounts, setUniversityCounts] = useState([]);
   const [instituteCounts, setInstituteCounts] = useState([]);
-  const [filterType, setFilterType] = useState('month'); // State to manage filter type
 
-  const handleFilterChange = ({ key }) => {
-    setFilterType(key);
-  };
-
-  const filterMenu = (
-    <Menu onClick={handleFilterChange}>
-      <Menu.Item key="week">Week</Menu.Item>
-      <Menu.Item key="month">Month</Menu.Item>
-      <Menu.Item key="year">Year</Menu.Item>
-    </Menu>
-  );
   useEffect(() => {
     const getData = async () => {
       const data = await fetchData();
@@ -188,6 +179,7 @@ export default function PreviewCard({
             counts[_id] = count;
           }
         });
+        console.log(counts)
         setInstituteCounts(counts);
       }
     };
@@ -195,26 +187,7 @@ export default function PreviewCard({
   }, [type]);
 
 
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchData();
-      if (data) {
-        const counts = {};
 
-        // Prepare university-wise counts
-        data.forEach((instituteData) => {
-          const { _id, count } = instituteData[0] || {};
-          if (_id && count) {
-            counts[_id] = count;
-          }
-        });
-
-        setInstituteCounts(counts);
-      }
-    };
-
-    getData();
-  }, []);
 
 
   const universityTagCounts = useMemo(() => {
@@ -246,14 +219,7 @@ export default function PreviewCard({
       sm={{ span: 24 }}
       md={{ span: 8 }}
       lg={{ span: 8 }}
-    > <Space>
-        <Dropdown overlay={filterMenu} trigger={['click']}>
-          <button className='bg-transparent'>
-            <FilterOutlined className='text-black' /> {filterType}
-          </button>
-        </Dropdown>
-      </Space>
-      <div className="pad20">
+    >       <div className="pad20">
 
         <h3
           style={{
