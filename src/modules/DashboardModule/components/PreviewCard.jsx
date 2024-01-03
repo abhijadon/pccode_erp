@@ -19,6 +19,10 @@ const colours = {
 
 const defaultStatistics = [
   {
+    tag: 'Total',
+    value: 0,
+  },
+  {
     tag: 'SPU',
     value: 0,
   },
@@ -58,6 +62,10 @@ const defaultStatistics = [
 ];
 
 const defaultInvoiceStatistics = [
+  {
+    tag: 'Total',
+    value: 0,
+  },
   {
     tag: 'HES',
     value: 0,

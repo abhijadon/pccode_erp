@@ -56,7 +56,7 @@ export default function DashboardModule() {
   };
   const fetchData = async () => {
     try {
-      const response = await fetch('https://sode-erp.onrender.com/api/payment/list');
+      const response = await fetch('https://sode-erp.onrender.com/api/payment/summary');
       const data = await response.json();
 
       if (data.success && data.result !== null) {
