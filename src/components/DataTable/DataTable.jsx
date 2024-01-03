@@ -439,14 +439,12 @@ export default function DataTable({ config, extra = [] }) {
 
           <div className="filter-container">
             <Input.Search
-              className='mt-3.5'
               placeholder="Search"
               onSearch={handleSearch}
               onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 200, marginRight: 16 }}
             />
             <Select
-              className='mt-3.5'
               placeholder="Select Rows to Download"
               style={{ width: 200, marginRight: 16 }}
               onChange={(value) => setDownloadCount(value)}
