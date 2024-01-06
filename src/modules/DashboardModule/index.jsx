@@ -56,7 +56,7 @@ export default function DashboardModule() {
   };
   const fetchData = async () => {
     try {
-      const response = await fetch('https://sode-erp.onrender.com/api/payment/list');
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/payment/filter`);
       const data = await response.json();
 
       if (data.success && data.result !== null) {
@@ -83,7 +83,7 @@ export default function DashboardModule() {
       if (selectedInstitute || selectedUniversity || selectedCounselor) {
         try {
           const response = await fetch(
-            `https://sode-erp.onrender.com/api/payment/summary?type=${selectedTimePeriod}&institute_name=${selectedInstitute}&university_name=${selectedUniversity}&counselor_email=${selectedCounselor}`
+            `${import.meta.env.VITE_BACKEND_SERVER}api/payment/summary?type=${selectedTimePeriod}&institute_name=${selectedInstitute}&university_name=${selectedUniversity}&counselor_email=${selectedCounselor}`
           );
           const data = await response.json();
 

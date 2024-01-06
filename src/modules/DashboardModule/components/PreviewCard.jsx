@@ -15,11 +15,13 @@ const colours = {
   cancel: '#13c2c2',
   Enrolled: '#722ed1',
   Alumini: '#614700',
+  Univeristy: '#614700',
+  Institute: '#614700'
 };
 
 const defaultStatistics = [
   {
-    tag: 'Total',
+    tag: 'University',
     value: 0,
   },
   {
@@ -63,7 +65,7 @@ const defaultStatistics = [
 
 const defaultInvoiceStatistics = [
   {
-    tag: 'Total',
+    tag: 'Institute',
     value: 0,
   },
   {
@@ -126,33 +128,38 @@ export default function PreviewCard({
   isLoading = false,
   entity = 'invoice',
   type,
-
 }) {
-
   const fetchData = async () => {
     try {
-      const response = await fetch(`https://sode-erp.onrender.com/api/payment/summary?type=${type}`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/payment/summary?type=${type}`);
       const data = await response.json();
 
-      if (data?.instituteSpecificData && data?.universitySpecificData && data?.statusSpecificData) {
-        // Combine institute and university specific data into a single array
-        return [...data.instituteSpecificData, ...data.universitySpecificData, ...data.statusSpecificData];
-      } else if (data?.instituteSpecificData) {
-        return data.instituteSpecificData;
-      } else if (data?.universitySpecificData) {
-        return data.universitySpecificData;
-      }
-      else if (data?.statusSpecificData) {
-        return data.universitySpecificData;
-      } else {
-        console.error('No specific data found in the response');
-        return [];
+      if (data) {
+        const counts = {};
+        const specificData = [...data.instituteSpecificData, ...data.universitySpecificData, ...data.statusSpecificData];
+
+        specificData.forEach((item) => {
+          const { _id, count } = item[0] || {};
+          if (_id && count) {
+            counts[_id] = count;
+          }
+        });
+
+        if (type === 'university') {
+          setUniversityCounts(counts);
+        } else {
+          setInstituteCounts(counts);
+        }
       }
     } catch (error) {
       console.error('Error fetching data:', error);
-      return [];
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [type]);
+
   const statisticsMap = useMemo(() => {
     let defaultStats = [];
     if (entity === 'invoice') {
@@ -172,46 +179,6 @@ export default function PreviewCard({
   const [universityCounts, setUniversityCounts] = useState([]);
   const [instituteCounts, setInstituteCounts] = useState([]);
 
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchData();
-      if (data) {
-        const counts = {};
-        // Prepare university-wise counts
-        data.forEach((universityData) => {
-          const { _id, count } = universityData[0] || {};
-          if (_id && count) {
-            counts[_id] = count;
-          }
-        });
-        setUniversityCounts(counts);
-      }
-    };
-    getData();
-  }, [type]);
-
-  useEffect(() => {
-    const getData = async () => {
-      const data = await fetchData();
-      if (data) {
-        const counts = {};
-        // Prepare institute-wise counts
-        data.forEach((instituteData) => {
-          const { _id, count } = instituteData[0] || {};
-          if (_id && count) {
-            counts[_id] = count;
-          }
-        });
-        setInstituteCounts(counts);
-      }
-    };
-    getData();
-  }, [type]);
-
-
-
-
-
   const universityTagCounts = useMemo(() => {
     const counts = {};
     Object.keys(universityCounts).forEach((tag) => {
@@ -227,6 +194,7 @@ export default function PreviewCard({
     });
     return counts;
   }, [instituteCounts]);
+
   const customSort = (a, b) => {
     const colorOrder = Object.values(colours);
     const indexA = colorOrder.indexOf(colours[a.tag]);
@@ -241,8 +209,8 @@ export default function PreviewCard({
       sm={{ span: 24 }}
       md={{ span: 8 }}
       lg={{ span: 8 }}
-    >       <div className="pad20">
-
+    >
+      <div className="pad20">
         <h3
           style={{
             color: '#22075e',
@@ -251,28 +219,23 @@ export default function PreviewCard({
             marginTop: 0,
           }}
         >
-
           {title}
-
         </h3>
         {!isLoading &&
           statisticsMap
             ?.map((status, index) => {
-              // Check if the status tag corresponds to a university count
-              const universityCount = universityTagCounts[status.tag];
-              if (universityCount !== undefined) {
+              const count = type === 'university' ? universityTagCounts[status.tag] : instituteTagCounts[status.tag];
+              if (count !== undefined) {
                 return (
                   <PreviewState
                     key={index}
                     tag={status.tag}
                     color={colours[status.tag]}
                     value={status.value}
-                    displayedValue={universityCount.toString()} // Show the university count
+                    displayedValue={count.toString()} // Show the count
                   />
                 );
               }
-
-              // For other status tags, render as before
               return (
                 <PreviewState
                   key={index}

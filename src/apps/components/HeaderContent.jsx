@@ -21,14 +21,16 @@ export default function HeaderContent() {
 
   useEffect(() => {
     async function fetchData() {
-      const result = await checkImage(BASE_URL + currentAdmin?.photo);
-      setHasPhotoprofile(result);
+      try {
+        const result = await checkImage(BASE_URL + currentAdmin?.photo);
+        setHasPhotoprofile(result);
+      } catch (error) {
+        console.error('Error checking image:', error);
+      }
     }
+
     fetchData();
-    return () => {
-      return false;
-    };
-  }, []);
+  }, [currentAdmin]);
 
   const srcImgProfile = hasPhotoprofile ? BASE_URL + currentAdmin?.photo : null;
 
@@ -89,6 +91,7 @@ export default function HeaderContent() {
       label: <Link to={'/logout'}>{translate('logout')}</Link>,
     },
   ];
+
   return (
     <Header
       style={{
@@ -108,7 +111,6 @@ export default function HeaderContent() {
         placement="bottomRight"
         style={{ width: '280px', float: 'right' }}
       >
-
         <Avatar
           className="last"
           src={srcImgProfile}
@@ -121,9 +123,8 @@ export default function HeaderContent() {
         >
           {currentAdmin?.name.charAt(0).toUpperCase()}
         </Avatar>
-
       </Dropdown>
-      <Badge count={notificationCount}>
+      <Badge count={notificationCount} showZero>
         <Dropdown
           className='mt-2'
           overlay={<Notifications setNotificationCount={setNotificationCount} />}
@@ -131,7 +132,7 @@ export default function HeaderContent() {
           trigger={['click']}
           style={{ marginRight: '15px' }}
         >
-          {<RocketOutlined className='text-white mt-2 text-2xl' />}
+          <RocketOutlined className='text-white mt-2 text-2xl' />
         </Dropdown>
       </Badge>
       <SelectLanguage />

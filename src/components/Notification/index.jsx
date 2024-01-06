@@ -11,7 +11,7 @@ const Notifications = ({ setNotificationCount }) => {
     const fetchNotifications = async () => {
       try {
         // Assume the API endpoint returns notifications
-        const response = await fetch('https://sode-erp.onrender.com/api/lead/list');
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/lead/list`);
         const data = await response.json();
 
         if (data.success && data.result && Array.isArray(data.result)) {

@@ -55,7 +55,7 @@ export default function DataTable({ config, extra = [] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const fetchData = async (entity = '') => {
     try {
-      const apiUrl = `https://sode-erp.onrender.com/api/lead/filter?entity=${entity}`;
+      const apiUrl = `${import.meta.env.VITE_BACKEND_SERVER}api/lead/filter?entity=${entity}`;
       const response = await fetch(apiUrl);
       const apiData = await response.json();
 
@@ -273,7 +273,7 @@ export default function DataTable({ config, extra = [] }) {
     try {
       setExportModalVisible(false);
 
-      const apiUrl = `https://sode-erp.onrender.com/api/lead/filter?entity=${entity}`;
+      const apiUrl = `${import.meta.env.VITE_BACKEND_SERVER}api/lead/filter?entity=${entity}`;
       const response = await fetch(apiUrl);
       const apiData = await response.json();
 
@@ -467,7 +467,7 @@ export default function DataTable({ config, extra = [] }) {
       }
       <Modal
         title="Select Export Format"
-        visible={exportModalVisible}
+        open={exportModalVisible}
         onOk={handleExportModalOk}
         onCancel={handleExportModalCancel}
       >

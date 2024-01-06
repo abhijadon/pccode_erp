@@ -319,7 +319,7 @@ export default function Lead() {
       title: translate('Student Document'),
       dataIndex: 'image',
       key: 'image',
-      render: (imageData, record, index) => {
+      render: (imageData) => {
         if (Array.isArray(imageData) && imageData.length > 0) {
           return (
             <div style={{ display: 'flex' }}>
@@ -398,7 +398,7 @@ export default function Lead() {
     <>
 
       <Modal
-        visible={previewVisible}
+        open={previewVisible}
         onCancel={() => setPreviewVisible(false)}
         footer={null}
         width={800}
