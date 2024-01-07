@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Col, Progress } from 'antd';
+import { Col, Progress, Modal, Row } from 'antd';
 import useLanguage from '@/locale/useLanguage';
-
+import { DownOutlined } from '@ant-design/icons';
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -55,6 +55,18 @@ const defaultStatistics = [
   },
   {
     tag: 'NMIMS',
+    value: 0,
+  },
+  {
+    tag: 'VIGNAN',
+    value: 0,
+  },
+  {
+    tag: 'VIGNAN',
+    value: 0,
+  },
+  {
+    tag: 'VIGNAN',
     value: 0,
   },
   {
@@ -121,6 +133,14 @@ const PreviewState = ({ tag, color, value, displayedValue }) => {
     </div>
   );
 };
+const ExpandIcon = ({ onClick }) => (
+  <div
+    style={{ cursor: 'pointer', fontSize: '24px', textAlign: 'center' }}
+    onClick={onClick}
+  >
+    <DownOutlined title='Show All' />
+  </div>
+);
 
 export default function PreviewCard({
   title = 'Preview',
@@ -129,6 +149,8 @@ export default function PreviewCard({
   entity = 'invoice',
   type,
 }) {
+  const [showAllUniversities, setShowAllUniversities] = useState(false); // State to control the modal visibility
+
   const fetchData = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/payment/summary?type=${type}`);
@@ -187,6 +209,9 @@ export default function PreviewCard({
     return counts;
   }, [universityCounts]);
 
+  const toggleShowAllUniversities = () => {
+    setShowAllUniversities(!showAllUniversities);
+  };
   const instituteTagCounts = useMemo(() => {
     const counts = {};
     Object.keys(instituteCounts).forEach((tag) => {
@@ -196,11 +221,16 @@ export default function PreviewCard({
   }, [instituteCounts]);
 
   const customSort = (a, b) => {
+    if (!a || !b) {
+      return 0; // Add your desired handling for null values
+    }
+
     const colorOrder = Object.values(colours);
     const indexA = colorOrder.indexOf(colours[a.tag]);
     const indexB = colorOrder.indexOf(colours[b.tag]);
     return indexA - indexB;
   };
+
 
   return (
     <Col
@@ -224,28 +254,55 @@ export default function PreviewCard({
         {!isLoading &&
           statisticsMap
             ?.map((status, index) => {
-              const count = type === 'university' ? universityTagCounts[status.tag] : instituteTagCounts[status.tag];
-              if (count !== undefined) {
+              const count =
+                type === 'university'
+                  ? universityTagCounts[status.tag]
+                  : instituteTagCounts[status.tag];
+              if (count !== undefined && count !== null && (!showAllUniversities || index < 6)) {
                 return (
                   <PreviewState
                     key={index}
                     tag={status.tag}
                     color={colours[status.tag]}
                     value={status.value}
-                    displayedValue={count.toString()} // Show the count
+                    displayedValue={count !== undefined ? count.toString() : ''} // Ensure displayedValue is defined
                   />
                 );
               }
-              return (
-                <PreviewState
-                  key={index}
-                  tag={status.tag}
-                  color={colours[status.tag]}
-                  value={status.value}
-                />
-              );
+              return null;
             })
+            .filter(Boolean) // Filter out null values
             .sort(customSort)}
+        {showAllUniversities && (
+          <Modal
+            title="All Universities"
+            visible={showAllUniversities}
+            onCancel={toggleShowAllUniversities}
+            footer={null}
+          >
+            <Row gutter={[16, 16]}>
+              {statisticsMap?.map((status, index) => {
+                const count =
+                  type === 'university'
+                    ? universityTagCounts[status.tag]
+                    : instituteTagCounts[status.tag];
+                return (
+                  <Col key={index} xs={{ span: 24 }} sm={{ span: 12 }} md={{ span: 12 }} lg={{ span: 6 }}>
+                    <PreviewState
+                      tag={status.tag}
+                      color={colours[status.tag]}
+                      value={status.value}
+                      displayedValue={count !== undefined ? count.toString() : ''} // Ensure displayedValue is defined
+                    />
+                  </Col>
+                );
+              })}
+            </Row>
+          </Modal>
+        )}
+        <div>
+          <ExpandIcon onClick={toggleShowAllUniversities} />
+        </div>
       </div>
     </Col>
   );
