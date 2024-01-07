@@ -123,7 +123,7 @@ const PreviewState = ({ tag, color, value, displayedValue }) => {
       <div className="left alignLeft uppercase">{translate(tag)}</div>
       <div className="right alignRight">{numericValue}</div>
       <Progress
-        percent={parseFloat(numericValue)}
+        percent={Math.min(parseFloat(numericValue) / 10, 100)} // Assuming numericValue represents your data value
         showInfo={false}
         strokeColor={{
           '0%': color,

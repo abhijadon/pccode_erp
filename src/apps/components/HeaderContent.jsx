@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Avatar, Dropdown, Layout, Badge } from 'antd';
 import Notifications from '@/components/Notification';
-import { SettingOutlined, LogoutOutlined, RocketOutlined } from '@ant-design/icons';
+import { SettingOutlined, LogoutOutlined, BellOutlined } from '@ant-design/icons';
 import { checkImage } from '@/request';
 import { selectCurrentAdmin } from '@/redux/auth/selectors';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,22 @@ export default function HeaderContent() {
 
     fetchData();
   }, [currentAdmin]);
+  useEffect(() => {
+    const fetchInitialNotifications = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/lead/getNotifications`);
+        const data = await response.json();
 
+        if (data.success && data.notifications && Array.isArray(data.notifications.notifications)) {
+          setNotificationCount(data.notifications.notificationCount);
+        }
+      } catch (error) {
+        console.error('Error fetching initial notifications:', error);
+      }
+    };
+
+    fetchInitialNotifications();
+  }, []);
   const srcImgProfile = hasPhotoprofile ? BASE_URL + currentAdmin?.photo : null;
 
   const ProfileDropdown = () => {
@@ -124,7 +139,7 @@ export default function HeaderContent() {
           {currentAdmin?.name.charAt(0).toUpperCase()}
         </Avatar>
       </Dropdown>
-      <Badge count={notificationCount} showZero>
+      <Badge count={notificationCount}>
         <Dropdown
           className='mt-2'
           overlay={<Notifications setNotificationCount={setNotificationCount} />}
@@ -132,7 +147,9 @@ export default function HeaderContent() {
           trigger={['click']}
           style={{ marginRight: '15px' }}
         >
-          <RocketOutlined className='text-white mt-2 text-2xl' />
+
+          <BellOutlined className='text-white mt-2 text-2xl' />
+
         </Dropdown>
       </Badge>
       <SelectLanguage />
