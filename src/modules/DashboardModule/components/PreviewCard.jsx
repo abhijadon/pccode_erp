@@ -21,7 +21,7 @@ const colours = {
 
 const defaultStatistics = [
   {
-    tag: 'University',
+    tag: 'Univeristy',
     value: 0,
   },
   {
