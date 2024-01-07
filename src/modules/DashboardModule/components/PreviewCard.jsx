@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { Col, Progress, Modal, Row } from 'antd';
 import useLanguage from '@/locale/useLanguage';
 import { DownOutlined } from '@ant-design/icons';
+
 const colours = {
   HES: '#595959',
   DES: '#1890ff',
@@ -88,7 +89,6 @@ const defaultInvoiceStatistics = [
     tag: 'DES',
     value: 0,
   },
-
 ];
 
 const defaultStatus = [
@@ -133,12 +133,10 @@ const PreviewState = ({ tag, color, value, displayedValue }) => {
     </div>
   );
 };
+
 const ExpandIcon = ({ onClick }) => (
-  <div
-    style={{ cursor: 'pointer', fontSize: '24px', textAlign: 'center' }}
-    onClick={onClick}
-  >
-    <DownOutlined title='Show All' />
+  <div style={{ cursor: 'pointer', fontSize: '24px', textAlign: 'center' }} onClick={onClick}>
+    <DownOutlined title="Show All" />
   </div>
 );
 
@@ -212,6 +210,7 @@ export default function PreviewCard({
   const toggleShowAllUniversities = () => {
     setShowAllUniversities(!showAllUniversities);
   };
+
   const instituteTagCounts = useMemo(() => {
     const counts = {};
     Object.keys(instituteCounts).forEach((tag) => {
@@ -231,55 +230,33 @@ export default function PreviewCard({
     return indexA - indexB;
   };
 
-
   return (
-    <Col
-      className="gutter-row"
-      xs={{ span: 24 }}
-      sm={{ span: 24 }}
-      md={{ span: 8 }}
-      lg={{ span: 8 }}
-    >
+    <Col className="gutter-row" xs={{ span: 24 }} sm={{ span: 24 }} md={{ span: 8 }} lg={{ span: 8 }}>
       <div className="pad20">
-        <h3
-          style={{
-            color: '#22075e',
-            fontSize: 'large',
-            marginBottom: 40,
-            marginTop: 0,
-          }}
-        >
-          {title}
-        </h3>
+        <h3 style={{ color: '#22075e', fontSize: 'large', marginBottom: 40, marginTop: 0 }}>{title}</h3>
         {!isLoading &&
           statisticsMap
-            ?.map((status, index) => {
+            ?.slice(0, 3)
+            .map((status, index) => {
               const count =
                 type === 'university'
                   ? universityTagCounts[status.tag]
                   : instituteTagCounts[status.tag];
-              if (count !== undefined && count !== null && (!showAllUniversities || index < 6)) {
-                return (
-                  <PreviewState
-                    key={index}
-                    tag={status.tag}
-                    color={colours[status.tag]}
-                    value={status.value}
-                    displayedValue={count !== undefined ? count.toString() : ''} // Ensure displayedValue is defined
-                  />
-                );
-              }
-              return null;
+              return (
+                <PreviewState
+                  key={index}
+                  tag={status.tag}
+                  color={colours[status.tag]}
+                  value={status.value}
+                  displayedValue={count !== undefined ? count.toString() : ''} // Ensure displayedValue is defined
+                />
+              );
             })
             .filter(Boolean) // Filter out null values
             .sort(customSort)}
+
         {showAllUniversities && (
-          <Modal
-            title="All Universities"
-            visible={showAllUniversities}
-            onCancel={toggleShowAllUniversities}
-            footer={null}
-          >
+          <Modal title="All Universities" visible={showAllUniversities} onCancel={toggleShowAllUniversities} footer={null}>
             <Row gutter={[16, 16]}>
               {statisticsMap?.map((status, index) => {
                 const count =
@@ -301,7 +278,7 @@ export default function PreviewCard({
           </Modal>
         )}
         <div>
-          <ExpandIcon onClick={toggleShowAllUniversities} />
+          {!showAllUniversities && <ExpandIcon onClick={toggleShowAllUniversities} />}
         </div>
       </div>
     </Col>
