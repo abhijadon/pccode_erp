@@ -8,6 +8,7 @@ import SummaryCard from './components/SummaryCard';
 import PreviewCard from './components/PreviewCard';
 import CustomerPreviewCard from './components/CustomerPreviewCard';
 import { useState, useEffect } from 'react';
+import DataYear from './components/DataYear'
 export default function DashboardModule() {
   const translate = useLanguage();
   const { moneyFormatter } = useMoney();
@@ -320,13 +321,12 @@ export default function DashboardModule() {
             newCustomer={clientResult?.new}
           />
         </Col>
-      </Row>
-      <div className="space30"></div>
+      </Row><div className="space30"></div>
       <Row gutter={[32, 32]}>
         <Col className="gutter-row w-full" sm={{ span: 24 }} lg={{ span: 12 }}>
           <div className="whiteBox shadow pad20" style={{ height: '100%' }}>
             <h3 style={{ color: '#22075e', marginBottom: 5, padding: '0 20px 20px' }}>
-              {translate('Recent Invoices')}
+              {translate('Recent Data')}
             </h3>
 
             <RecentTable entity={'invoice'} dataTableColumns={dataTableColumns} />
@@ -338,7 +338,7 @@ export default function DashboardModule() {
             <h3 style={{ color: '#22075e', marginBottom: 5, padding: '0 20px 20px' }}>
               {translate('Recent Quotes')}
             </h3>
-            <RecentTable entity={'quote'} dataTableColumns={dataTableColumns} />
+            <DataYear entity={'payment'} dataTableColumns={dataTableColumns} />
           </div>
         </Col>
       </Row>

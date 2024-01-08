@@ -34,7 +34,7 @@ export default function HeaderContent() {
   useEffect(() => {
     const fetchInitialNotifications = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/lead/getNotifications`);
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/lead/getNotifications`);
         const data = await response.json();
 
         if (data.success && data.notifications && Array.isArray(data.notifications.notifications)) {

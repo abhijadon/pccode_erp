@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-
 import { Button, Row, Col, Descriptions, Statistic, Tag, Divider, Typography } from 'antd';
 import { PageHeader } from '@ant-design/pro-layout';
 import {
@@ -9,7 +8,7 @@ import {
   MailOutlined,
   ExportOutlined,
 } from '@ant-design/icons';
-
+import dayjs from 'dayjs';
 import { useSelector, useDispatch } from 'react-redux';
 import { erp } from '@/redux/erp/actions';
 import useLanguage from '@/locale/useLanguage';
@@ -79,19 +78,6 @@ export default function ReadItem({ config, selectedItem }) {
 
   const resetErp = {
     status: '',
-    client: {
-      company: '',
-      email: '',
-      phone: '',
-      address: '',
-    },
-    subTotal: 0,
-    taxTotal: 0,
-    taxRate: 0,
-    total: 0,
-    credit: 0,
-    number: 0,
-    year: 0,
   };
 
   const [currentErp, setCurrentErp] = useState(selectedItem ?? resetErp);
@@ -111,7 +97,8 @@ export default function ReadItem({ config, selectedItem }) {
         onBack={() => {
           history.goBack();
         }}
-        title={`${ENTITY_NAME} # ${currentErp.number}/${currentErp.year || ''}`}
+        title={`${ENTITY_NAME}/${currentErp.student_name}/${dayjs(currentErp.created).format('DD/MM/YY') || ''}`}
+
         ghost={false}
         tags={<Tag color="volcano">{currentErp.paymentStatus || currentErp.status}</Tag>}
         extra={[
@@ -128,7 +115,7 @@ export default function ReadItem({ config, selectedItem }) {
             key={`${uniqueId()}`}
             onClick={() => {
               window.open(
-                `${DOWNLOAD_BASE_URL}${entity}/${entity}-${currentErp._id}.pdf`,
+                `${DOWNLOAD_BASE_URL}${entity}/${entity}-${currentErp.lead_id}.pdf`,
                 '_blank'
               );
             }}
@@ -171,21 +158,28 @@ export default function ReadItem({ config, selectedItem }) {
           <Statistic title="Status" value={currentErp.status} />
           <Statistic
             title={translate('SubTotal')}
-            value={moneyFormatter({ amount: currentErp.subTotal })}
+            value={moneyFormatter({ amount: currentErp.total_course_fee })}
             style={{
               margin: '0 32px',
             }}
           />
           <Statistic
             title={translate('Total')}
-            value={moneyFormatter({ amount: currentErp.total })}
+            value={moneyFormatter({ amount: currentErp.total_paid_amount })}
             style={{
               margin: '0 32px',
             }}
           />
           <Statistic
-            title={translate('Amount')}
-            value={moneyFormatter({ amount: currentErp.amount })}
+            title={translate('paid')}
+            value={moneyFormatter({ amount: currentErp.paid_amount })}
+            style={{
+              margin: '0 32px',
+            }}
+          />
+          <Statistic
+            title={translate('Due')}
+            value={moneyFormatter({ amount: currentErp.total_course_fee - currentErp.total_paid_amount })}
             style={{
               margin: '0 32px',
             }}
@@ -193,12 +187,16 @@ export default function ReadItem({ config, selectedItem }) {
         </Row>
       </PageHeader>
       <Divider dashed />
-      <Descriptions title={`${translate('Client')} : ${currentErp.client.company}`}>
-        <Descriptions.Item label={translate('Address')}>
-          {currentErp.client.address}
+      <Descriptions title={`${translate('Details')} : ${currentErp.client?.company || ''}`}>
+        <Descriptions.Item label={translate('Name')}>
+          {currentErp.student_name || ''}
         </Descriptions.Item>
-        <Descriptions.Item label={translate('email')}>{currentErp.client.email}</Descriptions.Item>
-        <Descriptions.Item label={translate('Phone')}>{currentErp.client.phone}</Descriptions.Item>
+        <Descriptions.Item label={translate('email')}>
+          {currentErp.email || ''}
+        </Descriptions.Item>
+        <Descriptions.Item label={translate('Phone')}>
+          {currentErp.phone || ''}
+        </Descriptions.Item>
       </Descriptions>
       <Divider />
       <Row>
@@ -206,7 +204,7 @@ export default function ReadItem({ config, selectedItem }) {
           <Typography.Title level={5}>{translate('Payment Information')} :</Typography.Title>
         </Col>
         <Col sm={24} md={12} style={{ textAlign: 'right' }}>
-          <Button icon={<ExportOutlined />}>label={translate('Show invoice')}</Button>
+          <Button icon={<ExportOutlined />}>{translate('Show invoice')}</Button>
         </Col>
       </Row>
       <div
@@ -218,32 +216,33 @@ export default function ReadItem({ config, selectedItem }) {
         }}
       >
         <Row gutter={[12, -5]}>
+          {Item}
           <Col className="gutter-row" span={12}>
-            <p>{translate('Amount')} :</p>
+            <p>{translate('Total Course Fee')} :</p>
           </Col>
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.amount })}</p>
-          </Col>
-
-          <Col className="gutter-row" span={12}>
-            <p>{translate('Total')} :</p>
-          </Col>
-          <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.total })}</p>
+            <p>{moneyFormatter({ amount: currentErp.total_course_fee })}</p>
           </Col>
 
           <Col className="gutter-row" span={12}>
             <p>{translate('Total Paid')} :</p>
           </Col>
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.credit })}</p>
+            <p>{moneyFormatter({ amount: currentErp.total_paid_amount })}</p>
           </Col>
 
           <Col className="gutter-row" span={12}>
-            <p>{translate('Total Remaining')} :</p>
+            <p>{translate('Paid')} :</p>
           </Col>
           <Col className="gutter-row" span={12}>
-            <p>{moneyFormatter({ amount: currentErp.total - currentErp.credit })}</p>
+            <p>{moneyFormatter({ amount: currentErp.paid_amount })}</p>
+          </Col>
+
+          <Col className="gutter-row" span={12}>
+            <p>{translate('Total Due')} :</p>
+          </Col>
+          <Col className="gutter-row" span={12}>
+            <p>{moneyFormatter({ amount: currentErp.total_course_fee - currentErp.total_paid_amount })}</p>
           </Col>
         </Row>
       </div>

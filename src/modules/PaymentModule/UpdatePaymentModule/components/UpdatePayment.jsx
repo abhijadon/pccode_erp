@@ -4,11 +4,8 @@ import dayjs from 'dayjs';
 import { useSelector, useDispatch } from 'react-redux';
 import { erp } from '@/redux/erp/actions';
 import { selectUpdatedItem } from '@/redux/erp/selectors';
-
 import useLanguage from '@/locale/useLanguage';
-
 import Loading from '@/components/Loading';
-
 import calculate from '@/utils/calculate';
 import PaymentForm from '@/forms/PaymentForm';
 export default function UpdatePayment({ config, currentInvoice }) {

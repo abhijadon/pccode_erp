@@ -1,8 +1,6 @@
-import React from 'react';
 import dayjs from 'dayjs';
-import { Form, Input, InputNumber } from 'antd';
+import { Form, Input, InputNumber, Select } from 'antd';
 import { DatePicker } from 'antd';
-import SelectAsync from '@/components/SelectAsync';
 import { useMoney } from '@/settings';
 
 import useLanguage from '@/locale/useLanguage';
@@ -14,8 +12,8 @@ export default function PaymentForm({ maxAmount = null, isUpdateForm = false }) 
   return (
     <>
       <Form.Item
-        label={translate('number')}
-        name="number"
+        label='Student ID'
+        name="lead_id"
         initialValue={1}
         rules={[
           {
@@ -24,8 +22,8 @@ export default function PaymentForm({ maxAmount = null, isUpdateForm = false }) 
         ]}
         style={{ width: '50%', float: 'left', paddingRight: '20px' }}
       >
-        <InputNumber min={1} style={{ width: '100%' }} />
-      </Form.Item>
+        <InputNumber min={1} style={{ width: '100%' }} readOnly />
+      </Form.Item >
       <Form.Item
         name="date"
         label={translate('date')}
@@ -40,7 +38,7 @@ export default function PaymentForm({ maxAmount = null, isUpdateForm = false }) 
       >
         <DatePicker format={'DD/MM/YYYY'} style={{ width: '100%' }} />
       </Form.Item>
-      <Form.Item label={translate('amount')} name="amount" rules={[{ required: true }]}>
+      <Form.Item label={translate('subtotal')} name="total_course_fee" rules={[{ required: true }]}>
         <InputNumber
           className="moneyInput"
           min={0}
@@ -50,28 +48,37 @@ export default function PaymentForm({ maxAmount = null, isUpdateForm = false }) 
           addonBefore={money.currency_position === 'before' ? money.currency_symbol : null}
         />
       </Form.Item>
-      <Form.Item
-        label={translate('payment Mode')}
-        name="paymentMode"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <SelectAsync
-          entity={'paymentMode'}
-          displayLabels={['name']}
-          loadDefault={true}
-          withRedirect={true}
-          urlToRedirect="/payment/mode"
-          redirectLabel="Add Payment Mode"
-        ></SelectAsync>
+      <Form.Item label={translate('total')} name="total_paid_amount" rules={[{ required: true }]}>
+        <InputNumber
+          className="moneyInput"
+          min={0}
+          controls={false}
+          max={maxAmount}
+          addonAfter={money.currency_position === 'after' ? money.currency_symbol : undefined}
+          addonBefore={money.currency_position === 'before' ? money.currency_symbol : null}
+        />
       </Form.Item>
-      <Form.Item label={translate('Reference')} name="ref">
+      <Form.Item label={translate('paid')} name="paid_amount" rules={[{ required: true }]}>
+        <InputNumber
+          className="moneyInput"
+          min={0}
+          controls={false}
+          max={maxAmount}
+          addonAfter={money.currency_position === 'after' ? money.currency_symbol : undefined}
+          addonBefore={money.currency_position === 'before' ? money.currency_symbol : null}
+        />
+      </Form.Item >
+      <Select name="status" style={{ width: '100%', marginTop: '10px' }}>
+        <Select.Option>New</Select.Option>
+        <Select.Option>Enrolled</Select.Option>
+        <Select.Option>Alumini</Select.Option>
+        <Select.Option>Cancel</Select.Option>
+      </ Select>
+      <Form.Item />
+      <Form.Item label={translate('Reference')} name="student_name">
         <Input />
       </Form.Item>
-      <Form.Item label={translate('Description')} name="description">
+      <Form.Item label={translate('Description')} name="remark">
         <TextArea />
       </Form.Item>
     </>
