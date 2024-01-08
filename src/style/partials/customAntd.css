@@ -13,6 +13,7 @@
   border-right: 1px solid #edf0f5;
   color: #4f5d75;
 }
+:where(.css-dkbvqv).ant-modal .ant-modal-close-x { color: red !important }
 
 element.style {
 }
