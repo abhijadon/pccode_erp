@@ -53,7 +53,7 @@ const Notifications = ({ setNotificationCount }) => {
       console.log('Message to delete:', messageToDelete); // Log the message parameter
 
       // Call your backend API to delete the notification using its message
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api / lead / deleteNotificationByMessage / ${messageToDelete}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}api/lead/deleteNotificationByMessage/${messageToDelete}`, {
         method: 'DELETE',
       });
 
