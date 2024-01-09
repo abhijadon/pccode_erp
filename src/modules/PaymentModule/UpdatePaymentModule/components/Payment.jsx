@@ -77,28 +77,28 @@ export default function Payment({ config, currentItem }) {
           lg={{ span: 10, order: 2, push: 4 }}
         >
           <div className="space50"></div>
-          <Descriptions title={`${translate('Client')} : ${currentErp.client.company}`} column={1}>
+          <Descriptions title={`${translate('Data')} : ${currentErp.lead_id}`} column={1}>
             <Descriptions.Item label={translate('email')}>
-              {currentErp.client.email}
+              {currentErp.email}
             </Descriptions.Item>
             <Descriptions.Item label={translate('Phone')}>
-              {currentErp.client.phone}
+              {currentErp.phone}
             </Descriptions.Item>
-            <Divider dashed />
+
             <Descriptions.Item label={translate('Payment Status')}>
-              {currentErp.paymentStatus}
+              {currentErp.status}
             </Descriptions.Item>
             <Descriptions.Item label={translate('SubTotal')}>
-              {money.amountFormatter({ amount: currentErp.subTotal })}
+              {money.amountFormatter({ amount: currentErp.total_course_fee })}
             </Descriptions.Item>
             <Descriptions.Item label={translate('Total')}>
-              {money.amountFormatter({ amount: currentErp.total })}
+              {money.amountFormatter({ amount: currentErp.total_paid_amount })}
             </Descriptions.Item>
-            <Descriptions.Item label="Discount">
-              {money.amountFormatter({ amount: currentErp.discount })}
+            <Descriptions.Item label="Paid">
+              {money.amountFormatter({ amount: currentErp.paid_amount })}
             </Descriptions.Item>
-            <Descriptions.Item label="Balance">
-              {money.amountFormatter({ amount: currentErp.credit })}
+            <Descriptions.Item label="Due">
+              {money.amountFormatter({ amount: currentErp.total_course_fee - currentErp.total_paid_amount })}
             </Descriptions.Item>
           </Descriptions>
         </Col>

@@ -81,9 +81,6 @@ element.style {
 .App {
   text-align: center;
 }
-:where(.css-dev-only-do-not-override-2i2tap).ant-row {
-  margin-top: 20px;
-}
 .App-logo {
   height: 40vmin;
   pointer-events: none;

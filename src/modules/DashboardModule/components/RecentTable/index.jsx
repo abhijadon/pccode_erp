@@ -1,135 +1,110 @@
-import { Descriptions, Dropdown, Table } from 'antd';
-import { request } from '@/request';
-import useFetch from '@/hooks/useFetch';
-import { EllipsisOutlined, EyeOutlined, EditOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { useDispatch } from 'react-redux';
-import { erp } from '@/redux/erp/actions';
-import useLanguage from '@/locale/useLanguage';
-import { useNavigate } from 'react-router-dom';
-import { DOWNLOAD_BASE_URL } from '@/config/serverApiConfig';
-import useResponsiveTable from '@/hooks/useResponsiveTable';
+import { BarChart } from '@mui/x-charts/BarChart';
+import { axisClasses } from '@mui/x-charts';
 
-export default function RecentTable({ ...props }) {
-  const translate = useLanguage();
-  let { entity, dataTableColumns } = props;
-
-  const items = [
+const chartSetting = {
+  yAxis: [
     {
-      label: translate('Show'),
-      key: 'read',
-      icon: <EyeOutlined />,
+      label: 'Data Month  ',
     },
-    {
-      label: translate('Edit'),
-      key: 'edit',
-      icon: <EditOutlined />,
+  ],
+  width: 500,
+  height: 300,
+  sx: {
+    [`.${axisClasses.left} .${axisClasses.label}`]: {
+      transform: 'translate(-20px, 0)',
     },
-    {
-      label: translate('Download'),
-      key: 'download',
-      icon: <FilePdfOutlined />,
-    },
-  ];
+  },
+};
+const dataset = [
+  {
+    India: 59,
+    NRI: 57,
+    newYork: 86,
+    seoul: 21,
+    month: 'Jan',
+  },
+  {
+    India: 50,
+    NRI: 52,
+    newYork: 78,
+    seoul: 28,
+    month: 'Fev',
+  },
+  {
+    India: 47,
+    NRI: 53,
+    month: 'Mar',
+  },
+  {
+    India: 54,
+    NRI: 56,
+    month: 'Apr',
+  },
+  {
+    India: 57,
+    NRI: 69,
+    month: 'May',
+  },
+  {
+    India: 60,
+    NRI: 63,
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+    month: 'June',
+  },
+  {
+    India: 59,
+    NRI: 60,
+    month: 'July',
+  },
+  {
+    India: 65,
+    NRI: 60,
+    newYork: 106,
+    seoul: 249,
+    month: 'Aug',
+  },
+  {
+    India: 51,
+    NRI: 51,
+    newYork: 95,
+    seoul: 131,
+    month: 'Sept',
+  },
+  {
+    India: 60,
+    NRI: 65,
+    newYork: 97,
+    seoul: 55,
+    month: 'Oct',
+  },
+  {
+    India: 67,
+    NRI: 64,
+    newYork: 76,
+    seoul: 48,
+    month: 'Nov',
+  },
+  {
+    India: 61,
+    NRI: 70,
+    newYork: 103,
+    seoul: 25,
+    month: 'Dec',
+  },
+];
 
-  const handleRead = (record) => {
-    dispatch(erp.currentItem({ data: record }));
-    navigate(`/${entity}/read/${record._id}`);
-  };
-  const handleEdit = (record) => {
-    dispatch(erp.currentAction({ actionType: 'update', data: record }));
-    navigate(`/${entity}/update/${record._id}`);
-  };
-  const handleDownload = (record) => {
-    window.open(`${DOWNLOAD_BASE_URL}${entity}/${entity}-${record._id}.pdf`, '_blank');
-  };
+const valueFormatter = (value) => `${value}mm`;
 
-  dataTableColumns = [
-    ...dataTableColumns,
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Dropdown
-          menu={{
-            items,
-            onClick: ({ key }) => {
-              switch (key) {
-                case 'read':
-                  handleRead(record);
-                  break;
-                case 'edit':
-                  handleEdit(record);
-                  break;
-                case 'download':
-                  handleDownload(record);
-                  break;
-
-                default:
-                  break;
-              }
-              // else if (key === '2')handleCloseTask
-            },
-          }}
-          trigger={['click']}
-        >
-          <EllipsisOutlined
-            style={{ cursor: 'pointer', fontSize: '24px' }}
-            onClick={(e) => e.preventDefault()}
-          />
-        </Dropdown>
-      ),
-    },
-  ];
-
-  const asyncList = () => {
-    return request.list({ entity });
-  };
-  const { result, isLoading, isSuccess } = useFetch(asyncList);
-  const firstFiveItems = () => {
-    if (isSuccess && result) return result.slice(0, 5);
-    return [];
-  };
-
-  const { expandedRowData, tableColumns, tableHeader } = useResponsiveTable(
-    dataTableColumns,
-    firstFiveItems()
-  );
-
+export default function BarsDataset() {
   return (
-    <div ref={tableHeader}>
-      <Table
-        columns={tableColumns}
-        rowKey={(item) => item._id}
-        dataSource={isSuccess && firstFiveItems()}
-        pagination={false}
-        loading={isLoading}
-        expandable={
-          expandedRowData.length
-            ? {
-              expandedRowRender: (record) => (
-                <Descriptions title="" bordered column={1}>
-                  {expandedRowData.map((item, index) => {
-                    return (
-                      <Descriptions.Item key={index} label={item.title}>
-                        {item.render?.(record[item.dataIndex])?.children
-                          ? item.render?.(record[item.dataIndex])?.children
-                          : item.render?.(record[item.dataIndex])
-                            ? item.render?.(record[item.dataIndex])
-                            : Array.isArray(item.dataIndex)
-                              ? record[item.dataIndex[0]]?.[item.dataIndex[1]]
-                              : record[item.dataIndex]}
-                      </Descriptions.Item>
-                    );
-                  })}
-                </Descriptions>
-              ),
-            }
-            : null
-        }
-      />
-    </div>
+    <BarChart
+      dataset={dataset}
+      xAxis={[{ scaleType: 'band', dataKey: 'month' }]}
+      series={[
+        { dataKey: 'India', label: 'India', valueFormatter },
+        { dataKey: 'NRI', label: 'NRI', valueFormatter },
+      ]}
+      {...chartSetting}
+    />
   );
 }
